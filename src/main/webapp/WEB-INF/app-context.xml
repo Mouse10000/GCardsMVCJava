@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			https://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context
+			https://www.springframework.org/schema/context/spring-context.xsd">
+
+
+
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/my_database"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <bean id="authorDAO" class="org.example.dao.DataSourceAuthorDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="bookDAO" class="org.example.dao.DataSourceBookDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="bookAuthorDAO" class="org.example.dao.DataSourceBookAuthorDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="myAppService" class="org.example.services.MyAppService">
+        <property name="authorDAO" ref="authorDAO"/>
+        <property name="bookDAO" ref="bookDAO"/>
+        <property name="bookAuthorDAO" ref="bookAuthorDAO"/>
+    </bean>
+
+
+</beans>
