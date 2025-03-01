@@ -11,7 +11,7 @@
 
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/my_database"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/collectionCards"/>
         <property name="username" value="root"/>
         <property name="password" value="root"/>
     </bean>
@@ -19,17 +19,43 @@
     <bean id="authorDAO" class="org.example.dao.DataSourceAuthorDAO">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-    <bean id="bookDAO" class="org.example.dao.DataSourceBookDAO">
+
+    <bean id="cardDAO" class="org.example.dao.DataSource.DataSourceCardDAO">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-    <bean id="bookAuthorDAO" class="org.example.dao.DataSourceBookAuthorDAO">
+    <bean id="cardRecipientDAO" class="org.example.dao.DataSource.DataSourceCardRecipientDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="cardSenderDAO" class="org.example.dao.DataSource.DataSourceCardSenderDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="roleDAO" class="org.example.dao.DataSource.DataSourceRoleDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="tradeDAO" class="org.example.dao.DataSource.DataSourceTradeDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="userCardDAO" class="org.example.dao.DataSource.DataSourceUserCardDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="userDAO" class="org.example.dao.DataSource.DataSourceUserDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="userRoleDAO" class="org.example.dao.DataSource.DataSourceUserRoleDAO">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id="myAppService" class="org.example.services.MyAppService">
         <property name="authorDAO" ref="authorDAO"/>
-        <property name="bookDAO" ref="bookDAO"/>
-        <property name="bookAuthorDAO" ref="bookAuthorDAO"/>
+
+        <property name="cardDAO" ref="cardDAO"/>
+        <property name="cardRecipientDAO" ref="cardRecipientDAO"/>
+        <property name="cardSenderDAO" ref="cardSenderDAO"/>
+        <property name="roleDAO" ref="roleDAO"/>
+        <property name="tradeDAO" ref="tradeDAO"/>
+        <property name="userDAO" ref="userDAO"/>
+        <property name="userCardDAO" ref="userCardDAO"/>
+        <property name="userRoleDAO" ref="userRoleDAO"/>
     </bean>
 
 
