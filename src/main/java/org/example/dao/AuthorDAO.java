@@ -10,5 +10,4 @@ public interface AuthorDAO {
     void updateAuthor(Author author);
     void deleteAuthor(int author_id);
     List<Author> getAllAuthors();
-
 }

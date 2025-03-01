@@ -64,7 +64,7 @@ public class DataSourceAuthorDAO implements AuthorDAO {
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, author.getName());
             stmt.setString(2, author.getCountry());
-            stmt.setInt(3, author.getId());
+            stmt.setLong(3, author.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

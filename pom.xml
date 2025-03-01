@@ -63,17 +63,22 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jetbrains</groupId>-->
+<!--            <artifactId>annotations</artifactId>-->
+<!--            <version>RELEASE</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>26.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.joutvhu</groupId>
+            <artifactId>spring-dynamic-jpa</artifactId>
+            <version>3.1.8</version>
         </dependency>
     </dependencies>
     <build>
