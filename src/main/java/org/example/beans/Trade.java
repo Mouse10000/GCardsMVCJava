@@ -2,26 +2,26 @@ package org.example.beans;
 
 
 public class Trade extends BaseBean {
-    private String userSender;
-    private String userRecipient;
+    private Long userSenderId;
+    private Long userRecipientId;
     private String state;
 
     // Getters and Setters
 
-    public String getUserSender() {
-        return userSender;
+    public Long getUserSenderId() {
+        return userSenderId;
     }
 
-    public void setUserSender(String userSender) {
-        this.userSender = userSender;
+    public void setUserSenderId(Long userSenderId) {
+        this.userSenderId = userSenderId;
     }
 
-    public String getUserRecipient() {
-        return userRecipient;
+    public Long getUserRecipientId() {
+        return userRecipientId;
     }
 
-    public void setUserRecipient(String userRecipient) {
-        this.userRecipient = userRecipient;
+    public void setUserRecipientId(Long userRecipientId) {
+        this.userRecipientId = userRecipientId;
     }
 
     public String getState() {

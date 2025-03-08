@@ -10,5 +10,5 @@ public interface UserCardDAO {
     void updateUserCard(UserCard userCard);
     void deleteUserCard(Long userCardId);
     List<UserCard> getAllUserCards();
-    List<UserCard> getUserCardsByUserName(String userName);
+    List<UserCard> getUserCardsByUserId(Long userId);
 }

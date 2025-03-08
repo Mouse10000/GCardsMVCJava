@@ -12,6 +12,7 @@ public class Card  extends BaseBean {
 
     // Getters and Setters
 
+
     public String getName() {
         return name;
     }

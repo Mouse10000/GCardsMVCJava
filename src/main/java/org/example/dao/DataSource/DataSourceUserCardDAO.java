@@ -18,114 +18,116 @@ public class DataSourceUserCardDAO implements UserCardDAO {
 
     @Override
     public void addUserCard(UserCard userCard) {
-        String sql = "INSERT INTO user_cards (user_name, card_id, count_duplicate) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO UserCard (UserId, CardId, CountDuplicate) VALUES (?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, userCard.getUserName());
-            stmt.setLong(2, userCard.getCardId());
-            stmt.setInt(3, userCard.getCountDuplicate());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+            statement.setLong(1, userCard.getUserId());
+            statement.setLong(2, userCard.getCardId());
+            statement.setInt(3, userCard.getCountDuplicate());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     userCard.setId(generatedKeys.getLong(1));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при добавлении карточки пользователя", e);
         }
     }
 
     @Override
     public UserCard getUserCardById(Long userCardId) {
-        String sql = "SELECT * FROM user_cards WHERE id = ?";
+        String sql = "SELECT * FROM UserCard WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userCardId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    UserCard userCard = new UserCard();
-                    userCard.setId(rs.getLong("id"));
-                    userCard.setUserName(rs.getString("user_name"));
-                    userCard.setCardId(rs.getLong("card_id"));
-                    userCard.setCountDuplicate(rs.getInt("count_duplicate"));
-                    return userCard;
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userCardId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapUserCardFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточки пользователя по ID", e);
         }
         return null;
     }
 
     @Override
     public void updateUserCard(UserCard userCard) {
-        String sql = "UPDATE user_cards SET user_name = ?, card_id = ?, count_duplicate = ? WHERE id = ?";
+        String sql = "UPDATE UserCard SET UserId = ?, CardId = ?, CountDuplicate = ? WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, userCard.getUserName());
-            stmt.setLong(2, userCard.getCardId());
-            stmt.setInt(3, userCard.getCountDuplicate());
-            stmt.setLong(4, userCard.getId());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userCard.getUserId());
+            statement.setLong(2, userCard.getCardId());
+            statement.setInt(3, userCard.getCountDuplicate());
+            statement.setLong(4, userCard.getId());
+
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при обновлении карточки пользователя", e);
         }
     }
 
     @Override
     public void deleteUserCard(Long userCardId) {
-        String sql = "DELETE FROM user_cards WHERE id = ?";
+        String sql = "DELETE FROM UserCard WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userCardId);
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userCardId);
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при удалении карточки пользователя", e);
         }
     }
 
     @Override
     public List<UserCard> getAllUserCards() {
         List<UserCard> userCards = new ArrayList<>();
-        String sql = "SELECT * FROM user_cards";
+        String sql = "SELECT * FROM UserCard";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                UserCard userCard = new UserCard();
-                userCard.setId(rs.getLong("id"));
-                userCard.setUserName(rs.getString("user_name"));
-                userCard.setCardId(rs.getLong("card_id"));
-                userCard.setCountDuplicate(rs.getInt("count_duplicate"));
-                userCards.add(userCard);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                userCards.add(mapUserCardFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении всех карточек пользователей", e);
         }
         return userCards;
     }
 
     @Override
-    public List<UserCard> getUserCardsByUserName(String userName) {
+    public List<UserCard> getUserCardsByUserId(Long userId) {
         List<UserCard> userCards = new ArrayList<>();
-        String sql = "SELECT * FROM user_cards WHERE user_name = ?";
+        String sql = "SELECT * FROM UserCard WHERE UserId = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, userName);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    UserCard userCard = new UserCard();
-                    userCard.setId(rs.getLong("id"));
-                    userCard.setUserName(rs.getString("user_name"));
-                    userCard.setCardId(rs.getLong("card_id"));
-                    userCard.setCountDuplicate(rs.getInt("count_duplicate"));
-                    userCards.add(userCard);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    userCards.add(mapUserCardFromResultSet(resultSet));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточек пользователя по ID", e);
         }
         return userCards;
+    }
+
+    private UserCard mapUserCardFromResultSet(ResultSet resultSet) throws SQLException {
+        UserCard userCard = new UserCard();
+        userCard.setId(resultSet.getLong("Id"));
+        userCard.setUserId(resultSet.getLong("UserId"));
+        userCard.setCardId(resultSet.getLong("CardId"));
+        userCard.setCountDuplicate(resultSet.getInt("CountDuplicate"));
+        return userCard;
     }
 }

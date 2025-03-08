@@ -6,8 +6,9 @@ import java.util.List;
 
 public interface CardDAO {
     void addCard(Card card);
-    Card getCardById(Long cardId);
+    Card getCardById(long cardId);
+    List<Card> getCardByName(String name);
     void updateCard(Card card);
-    void deleteCard(Long cardId);
+    void deleteCard(long cardId);
     List<Card> getAllCards();
 }

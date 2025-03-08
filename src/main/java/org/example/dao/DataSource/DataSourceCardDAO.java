@@ -11,110 +11,132 @@ import java.util.List;
 public class DataSourceCardDAO implements CardDAO {
 
     private DataSource dataSource;
-
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
     public void addCard(Card card) {
-        String sql = "INSERT INTO cards (name, date_of_add, description, image, rank, number) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Card (Name, DateOfAdd, Description, Image, CardRank, Number) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, card.getName());
-            stmt.setTimestamp(2, Timestamp.valueOf(card.getDateOfAdd()));
-            stmt.setString(3, card.getDescription());
-            stmt.setBytes(4, card.getImage());
-            stmt.setString(5, card.getRank());
-            stmt.setInt(6, card.getNumber());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+            statement.setString(1, card.getName());
+            statement.setTimestamp(2, Timestamp.valueOf(card.getDateOfAdd()));
+            statement.setString(3, card.getDescription());
+            statement.setBytes(4, card.getImage());
+            statement.setString(5, card.getRank());
+            statement.setInt(6, card.getNumber());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     card.setId(generatedKeys.getLong(1));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при добавлении карточки", e);
         }
     }
 
     @Override
-    public Card getCardById(Long cardId) {
-        String sql = "SELECT * FROM cards WHERE id = ?";
+    public Card getCardById(long cardId) {
+        String sql = "SELECT * FROM Card WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, cardId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Card card = new Card();
-                    card.setId(rs.getLong("id"));
-                    card.setName(rs.getString("name"));
-                    card.setDateOfAdd(rs.getTimestamp("date_of_add").toLocalDateTime());
-                    card.setDescription(rs.getString("description"));
-                    card.setImage(rs.getBytes("image"));
-                    card.setRank(rs.getString("rank"));
-                    card.setNumber(rs.getInt("number"));
-                    return card;
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, cardId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapCardFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточки по ID", e);
         }
         return null;
     }
 
     @Override
-    public void updateCard(Card card) {
-        String sql = "UPDATE cards SET name = ?, date_of_add = ?, description = ?, image = ?, rank = ?, number = ? WHERE id = ?";
+    public List<Card> getCardByName(String name) {
+        List<Card> cards = new ArrayList<>();
+        String sql = "SELECT * FROM Card WHERE Name = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, card.getName());
-            stmt.setTimestamp(2, Timestamp.valueOf(card.getDateOfAdd()));
-            stmt.setString(3, card.getDescription());
-            stmt.setBytes(4, card.getImage());
-            stmt.setString(5, card.getRank());
-            stmt.setInt(6, card.getNumber());
-            stmt.setLong(7, card.getId());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    cards.add(mapCardFromResultSet(resultSet));
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточек по названию", e);
+        }
+        return cards;
+    }
+
+    @Override
+    public void updateCard(Card card) {
+        String sql = "UPDATE Card SET Name = ?, DateOfAdd = ?, Description = ?, Image = ?, CardRank = ?, Number = ? WHERE Id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, card.getName());
+            statement.setTimestamp(2, Timestamp.valueOf(card.getDateOfAdd()));
+            statement.setString(3, card.getDescription());
+            statement.setBytes(4, card.getImage());
+            statement.setString(5, card.getRank());
+            statement.setInt(6, card.getNumber());
+            statement.setLong(7, card.getId());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при обновлении карточки", e);
         }
     }
 
     @Override
-    public void deleteCard(Long cardId) {
-        String sql = "DELETE FROM cards WHERE id = ?";
+    public void deleteCard(long cardId) {
+        String sql = "DELETE FROM Card WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, cardId);
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, cardId);
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при удалении карточки", e);
         }
     }
 
     @Override
     public List<Card> getAllCards() {
         List<Card> cards = new ArrayList<>();
-        String sql = "SELECT * FROM cards";
+        String sql = "SELECT * FROM Card";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Card card = new Card();
-                card.setId(rs.getLong("id"));
-                card.setName(rs.getString("name"));
-                card.setDateOfAdd(rs.getTimestamp("date_of_add").toLocalDateTime());
-                card.setDescription(rs.getString("description"));
-                card.setImage(rs.getBytes("image"));
-                card.setRank(rs.getString("rank"));
-                card.setNumber(rs.getInt("number"));
-                cards.add(card);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                cards.add(mapCardFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении всех карточек", e);
         }
         return cards;
     }
+
+    private Card mapCardFromResultSet(ResultSet resultSet) throws SQLException {
+        Card card = new Card();
+        card.setId(resultSet.getLong("Id"));
+        card.setName(resultSet.getString("Name"));
+        card.setDateOfAdd(resultSet.getTimestamp("DateOfAdd").toLocalDateTime());
+        card.setDescription(resultSet.getString("Description"));
+        card.setImage(resultSet.getBytes("Image"));
+        card.setRank(resultSet.getString("CardRank"));
+        card.setNumber(resultSet.getInt("Number"));
+        return card;
+    }
 }
+

@@ -2,18 +2,18 @@ package org.example.beans;
 
 
 public class UserCard extends BaseBean {
-    private String userName;
+    private Long userId;
     private Long cardId;
     private int countDuplicate;
 
     // Getters and Setters
 
-    public String getUserName() {
-        return userName;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getCardId() {

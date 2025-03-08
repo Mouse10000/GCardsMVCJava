@@ -18,86 +18,69 @@ public class DataSourceCardRecipientDAO implements CardRecipientDAO {
 
     @Override
     public void addCardRecipient(CardRecipient cardRecipient) {
-        String sql = "INSERT INTO card_recipients (trade_id, card_id) VALUES (?, ?)";
+        String sql = "INSERT INTO CardRecipient (TradeId, CardId) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, cardRecipient.getTradeId());
-            stmt.setLong(2, cardRecipient.getCardId());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+            statement.setLong(1, cardRecipient.getTradeId());
+            statement.setLong(2, cardRecipient.getCardId());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     cardRecipient.setId(generatedKeys.getInt(1));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при добавлении карточки-получателя", e);
         }
     }
 
     @Override
     public CardRecipient getCardRecipientById(int cardRecipientId) {
-        String sql = "SELECT * FROM card_recipients WHERE id = ?";
+        String sql = "SELECT * FROM CardRecipient WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cardRecipientId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    CardRecipient cardRecipient = new CardRecipient();
-                    cardRecipient.setId(rs.getInt("id"));
-                    cardRecipient.setTradeId(rs.getLong("trade_id"));
-                    cardRecipient.setCardId(rs.getLong("card_id"));
-                    return cardRecipient;
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cardRecipientId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapCardRecipientFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточки-получателя по ID", e);
         }
         return null;
     }
 
     @Override
-    public void updateCardRecipient(CardRecipient cardRecipient) {
-        String sql = "UPDATE card_recipients SET trade_id = ?, card_id = ? WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, cardRecipient.getTradeId());
-            stmt.setLong(2, cardRecipient.getCardId());
-            stmt.setLong(3, cardRecipient.getId());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void deleteCardRecipient(int cardRecipientId) {
-        String sql = "DELETE FROM card_recipients WHERE id = ?";
+        String sql = "DELETE FROM CardRecipient WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cardRecipientId);
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cardRecipientId);
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при удалении карточки-получателя", e);
         }
     }
 
     @Override
     public List<CardRecipient> getAllCardRecipients() {
         List<CardRecipient> cardRecipients = new ArrayList<>();
-        String sql = "SELECT * FROM card_recipients";
+        String sql = "SELECT * FROM CardRecipient";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                CardRecipient cardRecipient = new CardRecipient();
-                cardRecipient.setId(rs.getInt("id"));
-                cardRecipient.setTradeId(rs.getLong("trade_id"));
-                cardRecipient.setCardId(rs.getLong("card_id"));
-                cardRecipients.add(cardRecipient);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                cardRecipients.add(mapCardRecipientFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении всех карточек-получателей", e);
         }
         return cardRecipients;
     }
@@ -105,22 +88,27 @@ public class DataSourceCardRecipientDAO implements CardRecipientDAO {
     @Override
     public List<CardRecipient> getCardRecipientsByTradeId(Long tradeId) {
         List<CardRecipient> cardRecipients = new ArrayList<>();
-        String sql = "SELECT * FROM card_recipients WHERE trade_id = ?";
+        String sql = "SELECT * FROM CardRecipient WHERE TradeId = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, tradeId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    CardRecipient cardRecipient = new CardRecipient();
-                    cardRecipient.setId(rs.getInt("id"));
-                    cardRecipient.setTradeId(rs.getLong("trade_id"));
-                    cardRecipient.setCardId(rs.getLong("card_id"));
-                    cardRecipients.add(cardRecipient);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, tradeId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    cardRecipients.add(mapCardRecipientFromResultSet(resultSet));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточек-получателей по ID обмена", e);
         }
         return cardRecipients;
+    }
+
+    private CardRecipient mapCardRecipientFromResultSet(ResultSet resultSet) throws SQLException {
+        CardRecipient cardRecipient = new CardRecipient();
+        cardRecipient.setId(resultSet.getInt("Id"));
+        cardRecipient.setTradeId(resultSet.getLong("TradeId"));
+        cardRecipient.setCardId(resultSet.getLong("CardId"));
+        return cardRecipient;
     }
 }

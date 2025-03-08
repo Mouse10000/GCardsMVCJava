@@ -10,6 +10,6 @@ public interface TradeDAO {
     void updateTrade(Trade trade);
     void deleteTrade(Long tradeId);
     List<Trade> getAllTrades();
-    List<Trade> getTradesByUserSender(String userSender);
-    List<Trade> getTradesByUserRecipient(String userRecipient);
+    List<Trade> getTradesByUserSender(Long userSenderId);
+    List<Trade> getTradesByUserRecipient(Long userRecipientId);
 }

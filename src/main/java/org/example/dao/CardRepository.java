@@ -1,4 +1,4 @@
-package org.example.dao.Interface;
+package org.example.dao;
 
 import org.example.beans.Card;
 import org.springframework.data.jpa.repository.JpaRepository;

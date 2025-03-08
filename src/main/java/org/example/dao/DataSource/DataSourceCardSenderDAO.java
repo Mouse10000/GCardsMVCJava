@@ -18,109 +18,97 @@ public class DataSourceCardSenderDAO implements CardSenderDAO {
 
     @Override
     public void addCardSender(CardSender cardSender) {
-        String sql = "INSERT INTO card_senders (trade_id, card_id) VALUES (?, ?)";
+        String sql = "INSERT INTO CardSender (TradeId, CardId) VALUES (?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, cardSender.getTradeId());
-            stmt.setLong(2, cardSender.getCardId());
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+            statement.setLong(1, cardSender.getTradeId());
+            statement.setLong(2, cardSender.getCardId());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     cardSender.setId(generatedKeys.getInt(1));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при добавлении карточки-отправителя", e);
         }
     }
 
     @Override
     public CardSender getCardSenderById(int cardSenderId) {
-        String sql = "SELECT * FROM card_senders WHERE id = ?";
+        String sql = "SELECT * FROM CardSender WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cardSenderId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    CardSender cardSender = new CardSender();
-                    cardSender.setId(rs.getInt("id"));
-                    cardSender.setTradeId(rs.getLong("trade_id"));
-                    cardSender.setCardId(rs.getLong("card_id"));
-                    return cardSender;
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cardSenderId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapCardSenderFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточки-отправителя по ID", e);
         }
         return null;
     }
 
     @Override
-    public void updateCardSender(CardSender cardSender) {
-        String sql = "UPDATE card_senders SET trade_id = ?, card_id = ? WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, cardSender.getTradeId());
-            stmt.setLong(2, cardSender.getCardId());
-            stmt.setLong(3, cardSender.getId());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void deleteCardSender(int cardSenderId) {
-        String sql = "DELETE FROM card_senders WHERE id = ?";
+        String sql = "DELETE FROM CardSender WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cardSenderId);
-            stmt.executeUpdate();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cardSenderId);
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при удалении карточки-отправителя", e);
         }
     }
 
     @Override
     public List<CardSender> getAllCardSenders() {
         List<CardSender> cardSenders = new ArrayList<>();
-        String sql = "SELECT * FROM card_senders";
+        String sql = "SELECT * FROM CardSender";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                CardSender cardSender = new CardSender();
-                cardSender.setId(rs.getInt("id"));
-                cardSender.setTradeId(rs.getLong("trade_id"));
-                cardSender.setCardId(rs.getLong("card_id"));
-                cardSenders.add(cardSender);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                cardSenders.add(mapCardSenderFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении всех карточек-отправителей", e);
         }
         return cardSenders;
     }
 
     @Override
-    public List<CardSender> getCardSendersByTradeId(Long tradeId) {
+    public List<CardSender> getCardSendersByTradeId(long tradeId) {
         List<CardSender> cardSenders = new ArrayList<>();
-        String sql = "SELECT * FROM card_senders WHERE trade_id = ?";
+        String sql = "SELECT * FROM CardSender WHERE TradeId = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, tradeId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    CardSender cardSender = new CardSender();
-                    cardSender.setId(rs.getInt("id"));
-                    cardSender.setTradeId(rs.getLong("trade_id"));
-                    cardSender.setCardId(rs.getLong("card_id"));
-                    cardSenders.add(cardSender);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, tradeId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    cardSenders.add(mapCardSenderFromResultSet(resultSet));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при получении карточек-отправителей по ID обмена", e);
         }
         return cardSenders;
+    }
+
+    private CardSender mapCardSenderFromResultSet(ResultSet resultSet) throws SQLException {
+        CardSender cardSender = new CardSender();
+        cardSender.setId(resultSet.getInt("Id"));
+        cardSender.setTradeId(resultSet.getLong("TradeId"));
+        cardSender.setCardId(resultSet.getLong("CardId"));
+        return cardSender;
     }
 }
