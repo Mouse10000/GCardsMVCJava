@@ -1,6 +1,7 @@
 package org.example.dao.DataSource;
 
 import org.example.beans.User;
+import org.example.beans.UserCard;
 import org.example.dao.Interface.UserDAO;
 
 import javax.sql.DataSource;
@@ -155,6 +156,89 @@ public class DataSourceUserDAO implements UserDAO {
             throw new RuntimeException("Ошибка при получении ролей пользователя", e);
         }
         return roles;
+    }
+
+    @Override
+    public void addUserRole(long userId, long roleId) {
+        String sql = "INSERT INTO UserRole (UserId, RoleId) VALUES (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userId);
+            statement.setLong(2, roleId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при добавлении связи пользователь-роль", e);
+        }
+    }
+
+    @Override
+    public void removeUserRole(long userId, long roleId) {
+        String sql = "DELETE FROM UserRole WHERE UserId = ? AND RoleId = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userId);
+            statement.setLong(2, roleId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при удалении связи пользователь-роль", e);
+        }
+    }
+
+    @Override
+    public void addUserCard(UserCard userCard){
+        String sql = "INSERT INTO UserCard (UserId, CardId, CountDuplicate) VALUES (?, ?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setLong(1, userCard.getUserId());
+            statement.setLong(2, userCard.getCardId());
+            statement.setInt(3, userCard.getCountDuplicate());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    userCard.setId(generatedKeys.getLong(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при добавлении карточки пользователя", e);
+        }
+    }
+
+
+    @Override
+    public void updateUserCard(UserCard userCard) {
+        String sql = "UPDATE UserCard SET UserId = ?, CardId = ?, CountDuplicate = ? WHERE Id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userCard.getUserId());
+            statement.setLong(2, userCard.getCardId());
+            statement.setInt(3, userCard.getCountDuplicate());
+            statement.setLong(4, userCard.getId());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при обновлении карточки пользователя", e);
+        }
+    }
+
+    @Override
+    public void deleteUserCard(Long userCardId) {
+        String sql = "DELETE FROM UserCard WHERE Id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userCardId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при удалении карточки пользователя", e);
+        }
     }
 
     private User mapUserFromResultSet(ResultSet resultSet) throws SQLException {

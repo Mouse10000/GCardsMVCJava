@@ -32,12 +32,12 @@ public class DataSourceRoleDAO implements RoleDAO {
     }
 
     @Override
-    public Role getRoleById(String roleId) {
+    public Role getRoleById(Long roleId) {
         String sql = "SELECT * FROM Role WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, roleId);
+            statement.setLong(1, roleId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return mapRoleFromResultSet(resultSet);
@@ -65,12 +65,12 @@ public class DataSourceRoleDAO implements RoleDAO {
     }
 
     @Override
-    public void deleteRole(String roleId) {
+    public void deleteRole(Long roleId) {
         String sql = "DELETE FROM Role WHERE Id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, roleId);
+            statement.setLong(1, roleId);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при удалении роли", e);
@@ -92,6 +92,21 @@ public class DataSourceRoleDAO implements RoleDAO {
             throw new RuntimeException("Ошибка при получении всех ролей", e);
         }
         return roles;
+    }
+
+    @Override
+    public void addUserRole(long userId, long roleId) {
+        String sql = "INSERT INTO UserRole (UserId, RoleId) VALUES (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, userId);
+            statement.setLong(2, roleId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при добавлении связи пользователь-роль", e);
+        }
     }
 
     private Role mapRoleFromResultSet(ResultSet resultSet) throws SQLException {
