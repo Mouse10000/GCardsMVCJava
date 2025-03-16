@@ -19,7 +19,7 @@ public class MyAppService {
     public void addAuthor(Author author) throws SQLException {
         authorDAO.addAuthor(author);
     }
-    public Author getAuthorById(int id) throws SQLException {
+    public Author getAuthorById(Long id) throws SQLException {
         return authorDAO.getAuthorById(id);
     }
     public void updateAuthor(Author author) throws SQLException {

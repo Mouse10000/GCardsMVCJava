@@ -1,5 +1,7 @@
 package org.example.dao.DataSource;
 
+import org.example.beans.CardRecipient;
+import org.example.beans.CardSender;
 import org.example.beans.Trade;
 import org.example.dao.Interface.TradeDAO;
 
@@ -139,6 +141,48 @@ public class DataSourceTradeDAO implements TradeDAO {
             throw new RuntimeException("Ошибка при получении обменов по получателю", e);
         }
         return trades;
+    }
+
+    @Override
+    public void addCardSender(CardSender cardSender) {
+        String sql = "INSERT INTO CardSender (TradeId, CardId) VALUES (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setLong(1, cardSender.getTradeId());
+            statement.setLong(2, cardSender.getCardId());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    cardSender.setId(generatedKeys.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при добавлении карточки-отправителя", e);
+        }
+    }
+
+    @Override
+    public void addCardRecipient(CardRecipient cardRecipient) {
+        String sql = "INSERT INTO CardRecipient (TradeId, CardId) VALUES (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setLong(1, cardRecipient.getTradeId());
+            statement.setLong(2, cardRecipient.getCardId());
+
+            statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    cardRecipient.setId(generatedKeys.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при добавлении карточки-отправителя", e);
+        }
     }
 
     private Trade mapTradeFromResultSet(ResultSet resultSet) throws SQLException {

@@ -37,15 +37,15 @@ public class DataSourceAuthorDAO implements AuthorDAO {
     }
 
     @Override
-    public Author getAuthorById(int author_id) {
+    public Author getAuthorById(Long author_id) {
         String sql = "SELECT * FROM authors WHERE author_id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, author_id);
+            stmt.setLong(1, author_id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Author author = new Author();
-                    author.setId(rs.getInt("author_id"));
+                    author.setId(rs.getLong("author_id"));
                     author.setName(rs.getString("author_name"));
                     author.setCountry(rs.getString("author_country"));
                     return author;

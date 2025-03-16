@@ -2,6 +2,7 @@ package org.example.beans;
 
 import org.jetbrains.annotations.NotNull;
 
+
 public class Author extends BaseBean {
     @NotNull
     private String name = "";

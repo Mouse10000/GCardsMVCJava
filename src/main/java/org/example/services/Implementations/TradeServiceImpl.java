@@ -1,10 +1,13 @@
 package org.example.services.Implementations;
 
 
+import org.example.beans.CardRecipient;
+import org.example.beans.CardSender;
 import org.example.beans.Trade;
 import org.example.dao.Interface.CardDAO;
 import org.example.dao.Interface.TradeDAO;
 import org.example.dao.Interface.UserDAO;
+import org.example.services.Interface.Exception.Trade.TradeNotFoundException;
 import org.example.services.Interface.Exception.User.UserNotFoundException;
 import org.example.services.Interface.TradeService;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
@@ -51,11 +54,20 @@ public class TradeServiceImpl implements TradeService {
         tradeDAO.addTrade(trade);
 
         // Добавление карточек отправителя и получателя
+
+
         for (Long cardId : senderCardIds) {
-            tradeDAO.addCardSender(trade.getId(), cardId);
+            CardSender cardSender = new CardSender();
+            cardSender.setTradeId(trade.getId());
+            cardSender.setCardId(cardId);
+            tradeDAO.addCardSender(cardSender);
         }
+
         for (Long cardId : recipientCardIds) {
-            tradeDAO.addCardRecipient(trade.getId(), cardId);
+            CardRecipient cardRecipient = new CardRecipient();
+            cardRecipient.setTradeId(trade.getId());
+            cardRecipient.setCardId(cardId);
+            tradeDAO.addCardRecipient(cardRecipient);
         }
     }
 
