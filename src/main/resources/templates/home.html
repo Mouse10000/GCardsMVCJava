@@ -1,0 +1,19 @@
+<html th:replace="~{layout}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{page.home}">Home</title>
+</head>
+<body>
+<section th:fragment="content">
+  <div class="hero-section text-center">
+    <div class="container">
+      <h1 class="display-4 fw-bold" th:text="#{home.welcome}">Welcome</h1>
+      <p class="lead" th:text="#{home.description}">Site description...</p>
+      <div class="mt-4">
+        <a th:href="@{/auth/register}" class="btn btn-light btn-lg mx-2">Register account</a>
+        <a th:href="@{/auth/login}" class="btn btn-outline-light btn-lg mx-2">Login</a>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

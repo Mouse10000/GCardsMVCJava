@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         ApplicationContext ctx = new ClassPathXmlApplicationContext("dao.xml");
         
@@ -21,5 +21,5 @@ public class Main {
         System.out.println(author.getId());
 
 
-    }
+    }*/
 }

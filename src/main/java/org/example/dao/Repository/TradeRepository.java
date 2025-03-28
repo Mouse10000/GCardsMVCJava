@@ -1,4 +1,4 @@
-package org.example.dao.DataSource;
+package org.example.dao.Repository;
 
 import org.example.beans.CardRecipient;
 import org.example.beans.CardSender;
@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSourceTradeDAO implements TradeDAO {
+public class TradeRepository implements TradeDAO {
 
     private DataSource dataSource;
 

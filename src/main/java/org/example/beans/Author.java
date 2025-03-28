@@ -1,7 +1,7 @@
 package org.example.beans;
 
-import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.NotNull;
 
 public class Author extends BaseBean {
     @NotNull

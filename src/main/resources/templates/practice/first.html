@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:with="title='Home'">
+    <meta charset="UTF-8">
+    <title th:text="${title}">Title</title>
+</head>
+<body>
+    <div th:fragment="info">
+        <p>Это информационный раздел первого представления.</p>
+        <h1 th:utext="${#vars.projectName}">Project Name</h1>
+        <h2 th:utext="${#temporals.format(#vars.currentDateTime, 'dd.MM.yy HH:mm')}">Current Date and Time</h2>
+        <h3 th:utext="#{message.welcome(#{student.name})}"></h3>
+        <h4 th:utext="#{message.info(#{student.group})}"></h4>
+    </div>
+</body>
+</html>

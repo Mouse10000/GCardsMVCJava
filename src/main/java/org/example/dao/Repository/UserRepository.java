@@ -1,4 +1,4 @@
-package org.example.dao.DataSource;
+package org.example.dao.Repository;
 
 import org.example.beans.User;
 import org.example.beans.UserCard;
@@ -12,7 +12,7 @@ import java.util.List;
 import org.example.beans.Card;
 import org.example.beans.Role;
 
-public class DataSourceUserDAO implements UserDAO {
+public class UserRepository implements UserDAO {
 
     private DataSource dataSource;
 

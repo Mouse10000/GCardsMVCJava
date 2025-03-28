@@ -1,4 +1,4 @@
-package org.example.dao.DataSource;
+package org.example.dao.Repository;
 
 import org.example.beans.Role;
 import org.example.dao.Interface.RoleDAO;
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSourceRoleDAO implements RoleDAO {
+public class RoleRepository implements RoleDAO {
 
     private DataSource dataSource;
 

@@ -1,4 +1,4 @@
-package org.example.dao.DataSource;
+package org.example.dao.Repository;
 
 import org.example.beans.Card;
 import org.example.dao.Interface.CardDAO;
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSourceCardDAO implements CardDAO {
+public class CardRepository implements CardDAO {
 
     private DataSource dataSource;
     public void setDataSource(DataSource dataSource) {

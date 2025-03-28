@@ -1,4 +1,4 @@
-package org.example.dao.DataSource;
+package org.example.dao.Repository;
 
 import org.example.beans.CardSender;
 import org.example.dao.Interface.CardSenderDAO;
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSourceCardSenderDAO implements CardSenderDAO {
+public class CardSenderRepository implements CardSenderDAO {
 
     private DataSource dataSource;
 

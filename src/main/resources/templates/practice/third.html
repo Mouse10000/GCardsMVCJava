@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавление студента</title>
+</head>
+<body>
+<fieldset th:fragment="add-student-form">
+    <legend>Добавление студента</legend>
+    <div th:if="${param.addedStudent}">
+        <p style="color: green;">Студент успешно добавлен!</p>
+    </div>
+
+    <div th:if="${param.error}">
+        <p style="color: red;">Ошибка: <strong th:text="${param.error}"></strong></p>
+    </div>
+    <form action="#" th:action="@{/addStudent}" th:object="${model}" method="post">
+        <!-- Поля формы -->
+        <p>
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" th:field="*{id}">
+        </p>
+        <p>
+            <label for="firstName">Имя:</label>
+            <input type="text" id="firstName" name="firstName" th:field="*{firstName}">
+        </p>
+        <p>
+            <label for="sureName">Фамилия:</label>
+            <input type="text" id="sureName" name="sureName" th:field="*{sureName}">
+        </p>
+        <p>
+            <label for="isGraduated">Выпускник:</label>
+            <input type="checkbox" id="isGraduated" name="isGraduated" th:checked="*{isGraduated}">
+        </p>
+        <p>
+            <label for="mark">Оценка:</label>
+            <input type="number" id="mark" name="mark" th:field="*{mark}">
+        </p>
+        <!-- Кнопка отправки -->
+        <button type="submit">Добавить студента</button>
+    </form>
+    <a th:href="@{'/fourth'}">Вернуться на главную</a>
+</fieldset>
+</body>
+</html>
