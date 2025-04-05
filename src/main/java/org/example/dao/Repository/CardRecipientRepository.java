@@ -2,163 +2,78 @@ package org.example.dao.Repository;
 
 import org.example.beans.CardRecipient;
 import org.example.dao.Interface.CardRecipientDAO;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 /**
  * Реализация интерфейса CardRecipientDAO для работы с карточками-получателями в базе данных.
- * Предоставляет методы для добавления, получения, удаления и поиска карточек-получателей.
+ * Использует Spring JdbcTemplate для работы с БД.
  */
-@Component
+@Repository
 public class CardRecipientRepository implements CardRecipientDAO {
 
-    private DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
-    /**
-     * Устанавливает источник данных (DataSource) для подключения к базе данных.
-     *
-     * @param dataSource источник данных для подключения к БД
-     */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    @Autowired
+    public CardRecipientRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    /**
-     * Добавляет новую карточку-получателя в базу данных.
-     *
-     * @param cardRecipient объект CardRecipient для добавления
-     * @throws RuntimeException если возникает ошибка при работе с базой данных
-     */
+    private final RowMapper<CardRecipient> rowMapper = (rs, rowNum) -> {
+        CardRecipient cardRecipient = new CardRecipient();
+        cardRecipient.setId(rs.getInt("Id"));
+        cardRecipient.setTradeId(rs.getLong("TradeId"));
+        cardRecipient.setCardId(rs.getLong("CardId"));
+        return cardRecipient;
+    };
+
     @Override
     public void addCardRecipient(CardRecipient cardRecipient) {
         String sql = "INSERT INTO CardRecipient (TradeId, CardId) VALUES (?, ?)";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            statement.setLong(1, cardRecipient.getTradeId());
-            statement.setLong(2, cardRecipient.getCardId());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-            statement.executeUpdate();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, cardRecipient.getTradeId());
+            ps.setLong(2, cardRecipient.getCardId());
+            return ps;
+        }, keyHolder);
 
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    cardRecipient.setId(generatedKeys.getInt(1));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при добавлении карточки-получателя", e);
+        if (keyHolder.getKey() != null) {
+            cardRecipient.setId(keyHolder.getKey().intValue());
         }
     }
 
-    /**
-     * Получает карточку-получателя по её идентификатору.
-     *
-     * @param cardRecipientId идентификатор карточки-получателя
-     * @return объект CardRecipient или null, если карточка не найдена
-     * @throws RuntimeException если возникает ошибка при работе с базой данных
-     */
     @Override
     public CardRecipient getCardRecipientById(int cardRecipientId) {
         String sql = "SELECT * FROM CardRecipient WHERE Id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, cardRecipientId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return mapCardRecipientFromResultSet(resultSet);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении карточки-получателя по ID", e);
-        }
-        return null;
+        return jdbcTemplate.queryForObject(sql, rowMapper, cardRecipientId);
     }
 
-    /**
-     * Удаляет карточку-получателя по её идентификатору.
-     *
-     * @param cardRecipientId идентификатор карточки-получателя для удаления
-     * @throws RuntimeException если возникает ошибка при работе с базой данных
-     */
     @Override
     public void deleteCardRecipient(int cardRecipientId) {
         String sql = "DELETE FROM CardRecipient WHERE Id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, cardRecipientId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при удалении карточки-получателя", e);
-        }
+        jdbcTemplate.update(sql, cardRecipientId);
     }
 
-    /**
-     * Получает список всех карточек-получателей из базы данных.
-     *
-     * @return список объектов CardRecipient
-     * @throws RuntimeException если возникает ошибка при работе с базой данных
-     */
     @Override
     public List<CardRecipient> getAllCardRecipients() {
-        List<CardRecipient> cardRecipients = new ArrayList<>();
         String sql = "SELECT * FROM CardRecipient";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                cardRecipients.add(mapCardRecipientFromResultSet(resultSet));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении всех карточек-получателей", e);
-        }
-        return cardRecipients;
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
-    /**
-     * Получает список карточек-получателей по идентификатору обмена.
-     *
-     * @param tradeId идентификатор обмена
-     * @return список объектов CardRecipient, связанных с указанным обменом
-     * @throws RuntimeException если возникает ошибка при работе с базой данных
-     */
     @Override
     public List<CardRecipient> getCardRecipientsByTradeId(Long tradeId) {
-        List<CardRecipient> cardRecipients = new ArrayList<>();
         String sql = "SELECT * FROM CardRecipient WHERE TradeId = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setLong(1, tradeId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    cardRecipients.add(mapCardRecipientFromResultSet(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении карточек-получателей по ID обмена", e);
-        }
-        return cardRecipients;
-    }
-
-    /**
-     * Создает объект CardRecipient на основе данных из ResultSet.
-     *
-     * @param resultSet ResultSet с данными карточки-получателя
-     * @return объект CardRecipient
-     * @throws SQLException если возникает ошибка при чтении данных из ResultSet
-     */
-    private CardRecipient mapCardRecipientFromResultSet(ResultSet resultSet) throws SQLException {
-        CardRecipient cardRecipient = new CardRecipient();
-        cardRecipient.setId(resultSet.getInt("Id"));
-        cardRecipient.setTradeId(resultSet.getLong("TradeId"));
-        cardRecipient.setCardId(resultSet.getLong("CardId"));
-        return cardRecipient;
+        return jdbcTemplate.query(sql, rowMapper, tradeId);
     }
 }

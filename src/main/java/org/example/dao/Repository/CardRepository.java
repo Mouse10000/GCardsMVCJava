@@ -1,6 +1,7 @@
 package org.example.dao.Repository;
 
 import org.example.beans.Card;
+import org.example.config.DatabaseConfig;
 import org.example.dao.Interface.CardDAO;
 
 import javax.sql.DataSource;
@@ -11,7 +12,13 @@ import java.util.List;
 public class CardRepository implements CardDAO {
 
     private DataSource dataSource;
-    public void setDataSource(DataSource dataSource) {
+    // Конструктор с внедрением зависимости
+    public CardRepository() {
+        this.dataSource = DatabaseConfig.createDataSource();
+    }
+
+    // Альтернативный конструктор для тестирования с mock DataSource
+    public CardRepository(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -139,4 +146,3 @@ public class CardRepository implements CardDAO {
         return card;
     }
 }
-
