@@ -3,12 +3,14 @@ package org.example.dao.Repository;
 import org.example.beans.Card;
 import org.example.config.DatabaseConfig;
 import org.example.dao.Interface.CardDAO;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class CardRepository implements CardDAO {
 
     private DataSource dataSource;
