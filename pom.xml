@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>Gcards</artifactId>
-    <version>2</version>
+    <version>2-server</version>
     <packaging>war</packaging>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -68,6 +68,19 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version>
+        </dependency>
+        <!-- Swagger Core -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version> <!-- Check for newer versions -->
+        </dependency>
+
+        <!-- Swagger UI (HTML interface) -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version> <!-- Check for newer versions -->
         </dependency>
 
     </dependencies>
