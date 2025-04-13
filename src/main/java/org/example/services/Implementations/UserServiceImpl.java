@@ -15,6 +15,7 @@ import org.example.services.Interface.Exception.User.DuplicateUserException;
 import org.example.services.Interface.Exception.User.InvalidUserException;
 import org.example.services.Interface.Exception.User.UserNotFoundException;
 import org.example.services.Interface.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.function.Function;
 
+@Service
 public class UserServiceImpl implements UserService {
     private final CardDAO cardDAO;
     private final UserDAO userDAO;

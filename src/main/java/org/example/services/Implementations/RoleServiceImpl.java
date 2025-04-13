@@ -1,7 +1,6 @@
 package org.example.services.Implementations;
 
 import org.example.beans.Role;
-import org.example.beans.UserRole;
 import org.example.dao.Interface.RoleDAO;
 import org.example.dao.Interface.UserDAO;
 import org.example.dao.Interface.UserRoleDAO;
@@ -10,9 +9,11 @@ import org.example.services.Interface.Exception.Role.InvalidRoleException;
 import org.example.services.Interface.Exception.Role.RoleNotFoundException;
 import org.example.services.Interface.Exception.User.UserNotFoundException;
 import org.example.services.Interface.RoleService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class RoleServiceImpl implements RoleService {
     private final RoleDAO roleDAO;
     private final UserDAO userDAO;
@@ -104,4 +105,24 @@ public class RoleServiceImpl implements RoleService {
         }
         return userRoleDAO.getRolesByUserId(userId);
     }
+
+    @Override
+    public List<Role> getAllRoles() throws RoleNotFoundException {
+        List<Role> allRoles = roleDAO.getAllRoles();
+        if (allRoles.isEmpty()) {
+            throw new RoleNotFoundException("Roles not found");
+        }
+        return allRoles;
+    }
+
+    @Override
+    public Role getRoleById(long roleId) throws RoleNotFoundException {
+        Role existingRole = roleDAO.getRoleById(roleId);
+        if (existingRole == null) {
+            throw new RoleNotFoundException("Role with ID " + roleId + " not found.");
+        }
+        return existingRole;
+    }
+
+
 }

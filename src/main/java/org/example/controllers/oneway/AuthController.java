@@ -1,4 +1,4 @@
-package org.example.controllers;
+package org.example.controllers.oneway;
 
 import org.example.models.UserForm;
 import org.springframework.stereotype.Controller;

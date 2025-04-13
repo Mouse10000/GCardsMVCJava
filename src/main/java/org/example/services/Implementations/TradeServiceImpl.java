@@ -13,9 +13,11 @@ import org.example.services.Interface.TradeService;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.Trade.InvalidTradeStateException;
 import org.example.services.Interface.Exception.Trade.TradeException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class TradeServiceImpl implements TradeService {
     private final TradeDAO tradeDAO;
     private final CardDAO cardDAO;

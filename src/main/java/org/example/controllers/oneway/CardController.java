@@ -1,4 +1,4 @@
-package org.example.controllers;
+package org.example.controllers.oneway;
 
 import org.example.beans.Card;
 import org.example.dao.Repository.CardRepository;

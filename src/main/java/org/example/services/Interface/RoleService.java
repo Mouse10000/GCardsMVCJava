@@ -15,4 +15,6 @@ public interface RoleService {
     void assignRoleToUser(long userId, long roleId) throws UserNotFoundException, RoleNotFoundException;
     void removeRoleFromUser(long userId, long roleId) throws UserNotFoundException, RoleNotFoundException;
     List<Role> getRolesByUserId(long userId) throws UserNotFoundException;
+    List<Role> getAllRoles() throws RoleNotFoundException;
+    Role getRoleById(long roleId) throws RoleNotFoundException;
 }

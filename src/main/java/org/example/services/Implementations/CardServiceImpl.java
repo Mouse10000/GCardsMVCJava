@@ -7,9 +7,11 @@ import org.example.services.Interface.CardService;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.Card.DuplicateCardException;
 import org.example.services.Interface.Exception.Card.InvalidCardException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class CardServiceImpl implements CardService {
     private final CardDAO cardDAO;
 
@@ -22,7 +24,7 @@ public class CardServiceImpl implements CardService {
         if (card.getName() == null || card.getName().isEmpty()) {
             throw new InvalidCardException("Card name cannot be empty.");
         }
-        if (cardDAO.getCardByName(card.getName()) != null) {
+        if (cardDAO.getCardByName(card.getName()) == null) {
             throw new DuplicateCardException("Card with name " + card.getName() + " already exists.");
         }
         cardDAO.addCard(card);
