@@ -60,7 +60,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         resolver.setCharacterEncoding("UTF-8");
         return resolver;
     }
-    @Override
+    /*@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Swagger UI resources
         registry.addResourceHandler("swagger-ui.html")
@@ -68,6 +68,30 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }*/
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // WebJars должен быть первым
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+        // Swagger UI
+        registry.addResourceHandler("/swagger-ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/springdoc-openapi-ui/")
+                .resourceChain(false);
+
+        // Остальные ресурсы
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+
+        registry.addResourceHandler("/templates/**")
+                .addResourceLocations("classpath:/templates/");
+    }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedOrigins("*");
     }
     /*@Bean
     public MessageSource messageSource() {
@@ -97,4 +121,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/first").setViewName("practice/first");
         registry.addRedirectViewController("/", "/first");
     }
+
 }
