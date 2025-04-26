@@ -1,7 +1,6 @@
 package org.example.controllers.server;
 
-import org.example.beans.Card;
-import org.example.models.CardForm;
+import org.example.models.Card;
 import org.example.services.Interface.CardService;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.Card.DuplicateCardException;
@@ -31,30 +30,15 @@ public class CardServerController {
     // Обработка добавления карточки
     @PostMapping
     @ResponseStatus(CREATED)
-    public void addCard(@RequestBody CardForm cardForm) throws DuplicateCardException, InvalidCardException {
-        Card card = new Card();
-        card.setName(cardForm.getName());
-        card.setDescription(cardForm.getDescription());
-        card.setRank(cardForm.getRank());
-        card.setNumber(cardForm.getNumber());
-        card.setDateOfAdd(LocalDateTime.now());
-        card.setImage(new byte[0]); // Заглушка для изображения
+    public void addCard(@RequestBody Card card) throws DuplicateCardException, InvalidCardException {
         cardService.addCard(card);
     }
 
     // Обработка редактирования карточки
     @PutMapping("/{id}")
     public void editCard(@PathVariable("id") Long id,
-                         @RequestBody CardForm cardForm) throws CardNotFoundException, InvalidCardException {
-        Card card = cardService.getCardById(id);
-        if (card != null) {
-            card.setName(cardForm.getName());
-            card.setDescription(cardForm.getDescription());
-            card.setRank(cardForm.getRank());
-            card.setNumber(cardForm.getNumber());
-
-            cardService.updateCard(card);
-        }
+                         @RequestBody Card card) throws CardNotFoundException, InvalidCardException {
+        cardService.updateCard(card);
     }
 
     // Обработка удаления карточки

@@ -1,9 +1,8 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
 import org.example.beans.CardRecipient;
 import org.example.beans.CardSender;
-import org.example.beans.Trade;
-import org.example.dao.Interface.TradeDAO;
+import org.example.dao.Interface.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,12 +15,12 @@ import java.sql.Statement;
 import java.util.List;
 
 @Repository
-public class TradeRepository implements TradeDAO {
+public class TradeRepository implements Trade {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Trade> tradeRowMapper = (rs, rowNum) -> {
-        Trade trade = new Trade();
+    private final RowMapper<org.example.beans.Trade> tradeRowMapper = (rs, rowNum) -> {
+        org.example.beans.Trade trade = new org.example.beans.Trade();
         trade.setId(rs.getLong("Id"));
         trade.setUserSenderId(rs.getLong("UserSenderId"));
         trade.setUserRecipientId(rs.getLong("UserRecipientId"));
@@ -35,7 +34,7 @@ public class TradeRepository implements TradeDAO {
     }
 
     @Override
-    public void addTrade(Trade trade) {
+    public void addTrade(org.example.beans.Trade trade) {
         String sql = "INSERT INTO Trade (UserSenderId, UserRecipientId, State) VALUES (?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -54,13 +53,13 @@ public class TradeRepository implements TradeDAO {
     }
 
     @Override
-    public Trade getTradeById(Long tradeId) {
+    public org.example.beans.Trade getTradeById(Long tradeId) {
         String sql = "SELECT * FROM Trade WHERE Id = ?";
         return jdbcTemplate.queryForObject(sql, tradeRowMapper, tradeId);
     }
 
     @Override
-    public void updateTrade(Trade trade) {
+    public void updateTrade(org.example.beans.Trade trade) {
         String sql = "UPDATE Trade SET UserSenderId = ?, UserRecipientId = ?, State = ? WHERE Id = ?";
         jdbcTemplate.update(sql,
                 trade.getUserSenderId(),
@@ -76,19 +75,19 @@ public class TradeRepository implements TradeDAO {
     }
 
     @Override
-    public List<Trade> getAllTrades() {
+    public List<org.example.beans.Trade> getAllTrades() {
         String sql = "SELECT * FROM Trade";
         return jdbcTemplate.query(sql, tradeRowMapper);
     }
 
     @Override
-    public List<Trade> getTradesByUserSender(Long userSenderId) {
+    public List<org.example.beans.Trade> getTradesByUserSender(Long userSenderId) {
         String sql = "SELECT * FROM Trade WHERE UserSenderId = ?";
         return jdbcTemplate.query(sql, tradeRowMapper, userSenderId);
     }
 
     @Override
-    public List<Trade> getTradesByUserRecipient(Long userRecipientId) {
+    public List<org.example.beans.Trade> getTradesByUserRecipient(Long userRecipientId) {
         String sql = "SELECT * FROM Trade WHERE UserRecipientId = ?";
         return jdbcTemplate.query(sql, tradeRowMapper, userRecipientId);
     }

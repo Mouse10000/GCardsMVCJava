@@ -1,7 +1,6 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
-import org.example.beans.CardRecipient;
-import org.example.dao.Interface.CardRecipientDAO;
+import org.example.dao.Interface.CardRecipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -18,7 +17,7 @@ import java.util.List;
  * Использует Spring JdbcTemplate для работы с БД.
  */
 @Repository
-public class CardRecipientRepository implements CardRecipientDAO {
+public class CardRecipientRepository implements CardRecipient {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -27,8 +26,8 @@ public class CardRecipientRepository implements CardRecipientDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private final RowMapper<CardRecipient> rowMapper = (rs, rowNum) -> {
-        CardRecipient cardRecipient = new CardRecipient();
+    private final RowMapper<org.example.beans.CardRecipient> rowMapper = (rs, rowNum) -> {
+        org.example.beans.CardRecipient cardRecipient = new org.example.beans.CardRecipient();
         cardRecipient.setId(rs.getInt("Id"));
         cardRecipient.setTradeId(rs.getLong("TradeId"));
         cardRecipient.setCardId(rs.getLong("CardId"));
@@ -36,7 +35,7 @@ public class CardRecipientRepository implements CardRecipientDAO {
     };
 
     @Override
-    public void addCardRecipient(CardRecipient cardRecipient) {
+    public void addCardRecipient(org.example.beans.CardRecipient cardRecipient) {
         String sql = "INSERT INTO CardRecipient (TradeId, CardId) VALUES (?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -54,7 +53,7 @@ public class CardRecipientRepository implements CardRecipientDAO {
     }
 
     @Override
-    public CardRecipient getCardRecipientById(int cardRecipientId) {
+    public org.example.beans.CardRecipient getCardRecipientById(int cardRecipientId) {
         String sql = "SELECT * FROM CardRecipient WHERE Id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, cardRecipientId);
     }
@@ -66,13 +65,13 @@ public class CardRecipientRepository implements CardRecipientDAO {
     }
 
     @Override
-    public List<CardRecipient> getAllCardRecipients() {
+    public List<org.example.beans.CardRecipient> getAllCardRecipients() {
         String sql = "SELECT * FROM CardRecipient";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     @Override
-    public List<CardRecipient> getCardRecipientsByTradeId(Long tradeId) {
+    public List<org.example.beans.CardRecipient> getCardRecipientsByTradeId(Long tradeId) {
         String sql = "SELECT * FROM CardRecipient WHERE TradeId = ?";
         return jdbcTemplate.query(sql, rowMapper, tradeId);
     }

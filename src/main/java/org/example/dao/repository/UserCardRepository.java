@@ -1,7 +1,6 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
-import org.example.beans.UserCard;
-import org.example.dao.Interface.UserCardDAO;
+import org.example.dao.Interface.UserCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,12 +13,12 @@ import java.sql.Statement;
 import java.util.List;
 
 @Repository
-public class UserCardRepository implements UserCardDAO {
+public class UserCardRepository implements UserCard {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<UserCard> userCardRowMapper = (rs, rowNum) -> {
-        UserCard userCard = new UserCard();
+    private final RowMapper<org.example.beans.UserCard> userCardRowMapper = (rs, rowNum) -> {
+        org.example.beans.UserCard userCard = new org.example.beans.UserCard();
         userCard.setId(rs.getLong("Id"));
         userCard.setUserId(rs.getLong("UserId"));
         userCard.setCardId(rs.getLong("CardId"));
@@ -33,7 +32,7 @@ public class UserCardRepository implements UserCardDAO {
     }
 
     @Override
-    public void addUserCard(UserCard userCard) {
+    public void addUserCard(org.example.beans.UserCard userCard) {
         String sql = "INSERT INTO UserCard (UserId, CardId, CountDuplicate) VALUES (?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -52,13 +51,13 @@ public class UserCardRepository implements UserCardDAO {
     }
 
     @Override
-    public UserCard getUserCardById(Long userCardId) {
+    public org.example.beans.UserCard getUserCardById(Long userCardId) {
         String sql = "SELECT * FROM UserCard WHERE Id = ?";
         return jdbcTemplate.queryForObject(sql, userCardRowMapper, userCardId);
     }
 
     @Override
-    public void updateUserCard(UserCard userCard) {
+    public void updateUserCard(org.example.beans.UserCard userCard) {
         String sql = "UPDATE UserCard SET UserId = ?, CardId = ?, CountDuplicate = ? WHERE Id = ?";
         jdbcTemplate.update(sql,
                 userCard.getUserId(),
@@ -74,13 +73,13 @@ public class UserCardRepository implements UserCardDAO {
     }
 
     @Override
-    public List<UserCard> getAllUserCards() {
+    public List<org.example.beans.UserCard> getAllUserCards() {
         String sql = "SELECT * FROM UserCard";
         return jdbcTemplate.query(sql, userCardRowMapper);
     }
 
     @Override
-    public List<UserCard> getUserCardsByUserId(Long userId) {
+    public List<org.example.beans.UserCard> getUserCardsByUserId(Long userId) {
         String sql = "SELECT * FROM UserCard WHERE UserId = ?";
         return jdbcTemplate.query(sql, userCardRowMapper, userId);
     }

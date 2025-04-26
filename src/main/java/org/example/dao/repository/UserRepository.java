@@ -1,7 +1,7 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
 import org.example.beans.*;
-import org.example.dao.Interface.UserDAO;
+import org.example.dao.Interface.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,12 +14,12 @@ import java.sql.Statement;
 import java.util.List;
 
 @Repository
-public class UserRepository implements UserDAO {
+public class UserRepository implements User {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<User> userRowMapper = (rs, rowNum) -> {
-        User user = new User();
+    private final RowMapper<org.example.beans.User> userRowMapper = (rs, rowNum) -> {
+        org.example.beans.User user = new org.example.beans.User();
         user.setId(rs.getLong("Id"));
         user.setUserName(rs.getString("UserName"));
         user.setEmail(rs.getString("Email"));
@@ -52,7 +52,7 @@ public class UserRepository implements UserDAO {
     }
 
     @Override
-    public void addUser(User user) {
+    public void addUser(org.example.beans.User user) {
         String sql = "INSERT INTO User (Id, UserName, Email, PasswordHash) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 user.getId(),
@@ -62,13 +62,13 @@ public class UserRepository implements UserDAO {
     }
 
     @Override
-    public User getUserById(long userId) {
+    public org.example.beans.User getUserById(long userId) {
         String sql = "SELECT * FROM User WHERE Id = ?";
         return jdbcTemplate.queryForObject(sql, userRowMapper, userId);
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(org.example.beans.User user) {
         String sql = "UPDATE User SET UserName = ?, Email = ?, PasswordHash = ? WHERE Id = ?";
         jdbcTemplate.update(sql,
                 user.getUserName(),
@@ -84,13 +84,13 @@ public class UserRepository implements UserDAO {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<org.example.beans.User> getAllUsers() {
         String sql = "SELECT * FROM User";
         return jdbcTemplate.query(sql, userRowMapper);
     }
 
     @Override
-    public User getUserByUserName(String userName) {
+    public org.example.beans.User getUserByUserName(String userName) {
         String sql = "SELECT * FROM User WHERE UserName = ?";
         return jdbcTemplate.queryForObject(sql, userRowMapper, userName);
     }

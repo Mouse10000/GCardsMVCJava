@@ -1,52 +1,45 @@
 package org.example.controllers.oneway;
 
-import org.example.beans.Card;
-import org.example.dao.Repository.CardRepository;
-import org.example.models.CardForm;
+import org.example.models.Card;
+import org.example.services.Interface.CardService;
+import org.example.services.Interface.Exception.Card.CardNotFoundException;
+import org.example.services.Interface.Exception.Card.DuplicateCardException;
+import org.example.services.Interface.Exception.Card.InvalidCardException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
-
 @Controller
 @RequestMapping("/cards")
 public class CardController {
 
-    private final CardRepository cardRepository;
+    private final CardService cardService;
 
-    public CardController(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
+    public CardController(CardService cardService) {
+        this.cardService = cardService;
     }
 
     // Просмотр списка всех карточек
     @GetMapping
     public String listCards(Model model) {
-        model.addAttribute("cards", cardRepository.getAllCards());
+        model.addAttribute("cards", cardService.getAllCards());
         return "cards/list";
     }
 
     // Форма добавления новой карточки
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("cardForm", new CardForm());
+        model.addAttribute("card", new Card());
         return "cards/add-form";
     }
 
     // Обработка добавления карточки
     @PostMapping("/add")
-    public String addCard(@ModelAttribute CardForm cardForm,
-                          RedirectAttributes redirectAttributes) {
-        Card card = new Card();
-        card.setName(cardForm.getName());
-        card.setDescription(cardForm.getDescription());
-        card.setRank(cardForm.getRank());
-        card.setNumber(cardForm.getNumber());
-        card.setDateOfAdd(LocalDateTime.now());
-        card.setImage(new byte[0]); // Заглушка для изображения
+    public String addCard(@ModelAttribute Card card,
+                          RedirectAttributes redirectAttributes) throws DuplicateCardException, InvalidCardException {
 
-        cardRepository.addCard(card);
+        cardService.addCard(card);
 
         redirectAttributes.addFlashAttribute("successMessage", "Карточка успешно добавлена!");
         return "redirect:/cards";
@@ -55,35 +48,30 @@ public class CardController {
     // Форма редактирования карточки
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Card card = cardRepository.getCardById(id);
+        Card card = null;
+        try {
+            card = cardService.getCardById(id);
+        } catch (CardNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         if (card == null) {
             return "redirect:/cards";
         }
-
-        CardForm cardForm = new CardForm();
-        cardForm.setId(card.getId());
-        cardForm.setName(card.getName());
-        cardForm.setDescription(card.getDescription());
-        cardForm.setRank(card.getRank());
-        cardForm.setNumber(card.getNumber());
-
-        model.addAttribute("cardForm", cardForm);
-        return "cards/edit-form";
+        else {
+            model.addAttribute("card", card);
+            return"cards/edit-form";
+        }
     }
 
     // Обработка редактирования карточки
     @PostMapping("/edit")
-    public String editCard(@ModelAttribute CardForm cardForm,
-                           RedirectAttributes redirectAttributes) {
-        Card card = cardRepository.getCardById(cardForm.getId());
-        if (card != null) {
-            card.setName(cardForm.getName());
-            card.setDescription(cardForm.getDescription());
-            card.setRank(cardForm.getRank());
-            card.setNumber(cardForm.getNumber());
-
-            cardRepository.updateCard(card);
-            redirectAttributes.addFlashAttribute("successMessage", "Карточка успешно обновлена!");
+    public String editCard(Card card) {
+        try {
+            cardService.updateCard(card);
+        } catch (CardNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidCardException e) {
+            throw new RuntimeException(e);
         }
         return "redirect:/cards";
     }
@@ -91,7 +79,12 @@ public class CardController {
     // Форма подтверждения удаления
     @GetMapping("/delete/{id}")
     public String showDeleteForm(@PathVariable Long id, Model model) {
-        Card card = cardRepository.getCardById(id);
+        Card card = null;
+        try {
+            card = cardService.getCardById(id);
+        } catch (CardNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         if (card == null) {
             return "redirect:/cards";
         }
@@ -103,7 +96,11 @@ public class CardController {
     @PostMapping("/delete/{id}")
     public String deleteCard(@PathVariable Long id,
                              RedirectAttributes redirectAttributes) {
-        cardRepository.deleteCard(id);
+        try {
+            cardService.deleteCard(id);
+        } catch (CardNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Карточка успешно удалена!");
         return "redirect:/cards";
     }

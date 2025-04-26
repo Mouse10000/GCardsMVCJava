@@ -1,8 +1,8 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
 import org.example.beans.Role;
 import org.example.beans.User;
-import org.example.dao.Interface.UserRoleDAO;
+import org.example.dao.Interface.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserRoleRepository implements UserRoleDAO {
+public class UserRoleRepository implements UserRole {
 
     private final JdbcTemplate jdbcTemplate;
 

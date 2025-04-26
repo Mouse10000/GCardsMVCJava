@@ -1,7 +1,6 @@
-package org.example.dao.Repository;
+package org.example.dao.repository;
 
-import org.example.beans.CardSender;
-import org.example.dao.Interface.CardSenderDAO;
+import org.example.dao.Interface.CardSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,12 +16,12 @@ import java.util.List;
  * Реализация интерфейса CardSenderDAO с использованием Spring JdbcTemplate
  */
 @Repository
-public class CardSenderRepository implements CardSenderDAO {
+public class CardSenderRepository implements CardSender {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<CardSender> rowMapper = (rs, rowNum) -> {
-        CardSender cardSender = new CardSender();
+    private final RowMapper<org.example.beans.CardSender> rowMapper = (rs, rowNum) -> {
+        org.example.beans.CardSender cardSender = new org.example.beans.CardSender();
         cardSender.setId(rs.getInt("Id"));
         cardSender.setTradeId(rs.getLong("TradeId"));
         cardSender.setCardId(rs.getLong("CardId"));
@@ -35,7 +34,7 @@ public class CardSenderRepository implements CardSenderDAO {
     }
 
     @Override
-    public void addCardSender(CardSender cardSender) {
+    public void addCardSender(org.example.beans.CardSender cardSender) {
         String sql = "INSERT INTO CardSender (TradeId, CardId) VALUES (?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -53,7 +52,7 @@ public class CardSenderRepository implements CardSenderDAO {
     }
 
     @Override
-    public CardSender getCardSenderById(int cardSenderId) {
+    public org.example.beans.CardSender getCardSenderById(int cardSenderId) {
         String sql = "SELECT * FROM CardSender WHERE Id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, cardSenderId);
     }
@@ -65,13 +64,13 @@ public class CardSenderRepository implements CardSenderDAO {
     }
 
     @Override
-    public List<CardSender> getAllCardSenders() {
+    public List<org.example.beans.CardSender> getAllCardSenders() {
         String sql = "SELECT * FROM CardSender";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     @Override
-    public List<CardSender> getCardSendersByTradeId(long tradeId) {
+    public List<org.example.beans.CardSender> getCardSendersByTradeId(long tradeId) {
         String sql = "SELECT * FROM CardSender WHERE TradeId = ?";
         return jdbcTemplate.query(sql, rowMapper, tradeId);
     }
