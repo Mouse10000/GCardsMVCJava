@@ -1,10 +1,8 @@
 package org.example.models;
 
-import org.hibernate.mapping.Set;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -18,6 +16,12 @@ public class User {
 
     @Column(nullable = false)
     private String passwordHash;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -33,5 +37,57 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    public Set<Role> getRoles() {
+        Set<Role> roles = new HashSet<>();
+        for (UserRole userRole : userRoles) {
+            roles.add(userRole.getRole());
+        }
+        return roles;
+    }
+
+    public void addRole(Role role) {
+        UserRole userRole = new UserRole(this, role);
+        userRoles.add(userRole);
+    }
+
+    public void removeRole(Role role) {
+        userRoles.removeIf(userRole -> userRole.getRole().equals(role));
+    }
+
+    public void assignRole(Role role) {
+        if (!hasRole(role)) {
+            addRole(role);
+        }
+    }
+
+    public void assignRoles(Set<Role> roles) {
+        for (Role role : roles) {
+            assignRole(role);
+        }
+    }
+
+    public boolean hasRole(Role role) {
+        return getRoles().contains(role);
+    }
+
+    public boolean hasRole(String roleName) {
+        return getRoles().stream()
+                .anyMatch(role -> role.getName().equals(roleName));
+    }
 }

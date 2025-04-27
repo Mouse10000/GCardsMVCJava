@@ -1,8 +1,8 @@
 package org.example.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name="Role")
 @Table(name = "role")
@@ -14,8 +14,8 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "user")
-    private List<User> users = new ArrayList<>();
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public Role() {}
 
@@ -44,11 +44,34 @@ public class Role {
         this.name = name;
     }
 
-    public List<User> getUsers() {
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    public Set<User> getUsers() {
+        Set<User> users = new HashSet<>();
+        for (UserRole userRole : userRoles) {
+            users.add(userRole.getUser());
+        }
         return users;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void addUser(User user) {
+        UserRole userRole = new UserRole(user, this);
+        userRoles.add(userRole);
+    }
+
+    public void removeUser(User user) {
+        userRoles.removeIf(userRole -> userRole.getUser().equals(user));
+    }
+
+    public static Role createNewRole(String name) {
+        Role role = new Role();
+        role.setName(name);
+        return role;
     }
 }
