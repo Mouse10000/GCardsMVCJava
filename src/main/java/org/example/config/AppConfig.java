@@ -13,6 +13,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
@@ -28,7 +29,7 @@ import java.util.Properties;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "org.example")
-@EnableJpaRepositories(basePackages = "org.example.dao")
+@EnableJpaRepositories(basePackages = "org.example")
 @PropertySource("classpath:application.properties")
 public class AppConfig implements WebMvcConfigurer {
 
@@ -37,7 +38,7 @@ public class AppConfig implements WebMvcConfigurer {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         try {
             dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            dataSource.setUrl("jdbc:mysql://localhost:3306/collectioncards?" +
+            dataSource.setUrl("jdbc:mysql://localhost:3306/myshop?" +
                     "useSSL=false&" +
                     "serverTimezone=UTC&" +
                     "allowPublicKeyRetrieval=true&" +
@@ -54,7 +55,7 @@ public class AppConfig implements WebMvcConfigurer {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("org.example.models");
+        em.setPackagesToScan("org.example");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

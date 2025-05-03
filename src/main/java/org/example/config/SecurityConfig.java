@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,54 +13,53 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private DataSource dataSource;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder());
+        auth.jdbcAuthentication()
+                .dataSource(dataSource)
+                .usersByUsernameQuery("SELECT u.username, u.password, 'true' as enabled FROM users u WHERE u.username=?")
+                .authoritiesByUsernameQuery(
+                        "SELECT u.username, r.name " +
+                        "FROM users u " +
+                        //"INNER JOIN user_role ur ON u.id = ur.user_id " +
+                        //"INNER JOIN roles r ON ur.role_id = r.id " +
+                        "INNER JOIN roles r ON u.role_id = r.id " +
+                        "WHERE u.username=?"
+                )
+                .passwordEncoder(passwordEncoder)
+                .rolePrefix("");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-                .antMatchers("/", "/home", "/auth/register", "/css/**", "/js/**", "/images/**").permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
+                .authorizeRequests()
+                .antMatchers("/register").permitAll()
+                .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers("/profile").authenticated()
                 .anyRequest().authenticated()
-            .and()
-            .formLogin()
-                .loginPage("/auth/login")
-                .defaultSuccessUrl("/home")
-                .failureUrl("/auth/login?error=true")
+                .and()
+                .formLogin()
+                .loginPage("/login")
+                .defaultSuccessUrl("/profile", true)
+                .failureUrl("/login?error=true")
                 .permitAll()
-            .and()
-            .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
-                .logoutSuccessUrl("/home")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-            .and()
-            .exceptionHandling()
-                .accessDeniedPage("/error?error=access-denied")
-            .and()
-            .sessionManagement()
-                .invalidSessionUrl("/error?error=invalid-session")
-                .maximumSessions(1)
-                .expiredUrl("/error?error=session-expired")
-            .and()
-            .and()
-            .csrf();
+                .and()
+                .logout()
+                .logoutSuccessUrl("/login")
+                .permitAll();
     }
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User1 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +21,7 @@ public class User {
     private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> userRoles = new HashSet<>();
+    private Set<UserRole1> userRole1s = new HashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -45,44 +45,44 @@ public class User {
         this.email = email;
     }
 
-    public Set<UserRole> getUserRoles() {
-        return userRoles;
+    public Set<UserRole1> getUserRoles() {
+        return userRole1s;
     }
 
-    public void setUserRoles(Set<UserRole> userRoles) {
-        this.userRoles = userRoles;
+    public void setUserRoles(Set<UserRole1> userRole1s) {
+        this.userRole1s = userRole1s;
     }
 
-    public Set<Role> getRoles() {
-        Set<Role> roles = new HashSet<>();
-        for (UserRole userRole : userRoles) {
-            roles.add(userRole.getRole());
+    public Set<Role1> getRoles() {
+        Set<Role1> roles = new HashSet<>();
+        for (UserRole1 userRole1 : userRole1s) {
+            roles.add(userRole1.getRole());
         }
         return roles;
     }
 
-    public void addRole(Role role) {
-        UserRole userRole = new UserRole(this, role);
-        userRoles.add(userRole);
+    public void addRole(Role1 role) {
+        UserRole1 userRole1 = new UserRole1(this, role);
+        userRole1s.add(userRole1);
     }
 
-    public void removeRole(Role role) {
-        userRoles.removeIf(userRole -> userRole.getRole().equals(role));
+    public void removeRole(Role1 role) {
+        userRole1s.removeIf(userRole1 -> userRole1.getRole().equals(role));
     }
 
-    public void assignRole(Role role) {
+    public void assignRole(Role1 role) {
         if (!hasRole(role)) {
             addRole(role);
         }
     }
 
-    public void assignRoles(Set<Role> roles) {
-        for (Role role : roles) {
+    public void assignRoles(Set<Role1> roles) {
+        for (Role1 role : roles) {
             assignRole(role);
         }
     }
 
-    public boolean hasRole(Role role) {
+    public boolean hasRole(Role1 role) {
         return getRoles().contains(role);
     }
 

@@ -2,7 +2,8 @@ package org.example.models;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
+
+@Entity(name = "Card")
 @Table(name = "card")
 public class Card {
     @Id
