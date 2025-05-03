@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout}">
+<head>
+    <title>Role Management</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Role Management</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Сообщения об успехе/ошибке -->
+                        <div th:if="${success}" class="alert alert-success">
+                            <span th:text="${success}"></span>
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger">
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <!-- Таблица ролей -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Role Name</th>
+                                        <th>Users</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="role : ${roles}">
+                                        <td th:text="${role.name}"></td>
+                                        <td>
+                                            <span th:each="user, stat : ${role.users}">
+                                                <span th:text="${user.username}"></span>
+                                                <span th:if="${!stat.last}">, </span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info" data-bs-toggle="modal" th:data-bs-target="'#assignRoleModal-' + ${role.id}">
+                                                Assign Users
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Модальные окна для назначения пользователей -->
+                        <div th:each="role : ${roles}" th:id="'assignRoleModal-' + ${role.id}" class="modal fade" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Assign Users to <span th:text="${role.name}"></span></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form th:action="@{/admin/roles/assign}" method="post">
+                                            <input type="hidden" name="roleName" th:value="${role.name}">
+                                            <div class="mb-3">
+                                                <label class="form-label">Select User</label>
+                                                <select name="userId" class="form-select">
+                                                    <option th:each="user : ${allUsers}" th:value="${user.id}" th:text="${user.username}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Assign</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

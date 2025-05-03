@@ -1,7 +1,5 @@
 package org.example.model;
 
-import org.example.models.User1;
-import org.example.models.UserRole1;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -18,7 +16,7 @@ public class Role {
     private String name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole1> userRole1s = new HashSet<>();
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public Role() {}
 
@@ -47,33 +45,33 @@ public class Role {
         this.name = name;
     }
 
-    public Set<UserRole1> getUserRoles() {
-        return userRole1s;
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
     }
 
-    public void setUserRoles(Set<UserRole1> userRole1s) {
-        this.userRole1s = userRole1s;
+    public void setUserRoles(Set<UserRole> userRole1s) {
+        this.userRoles = userRole1s;
     }
 
-    public Set<User1> getUsers() {
-        Set<User1> users = new HashSet<>();
-        for (UserRole1 userRole1 : userRole1s) {
+    public Set<User> getUsers() {
+        Set<User> users = new HashSet<>();
+        for (UserRole userRole1 : userRoles) {
             users.add(userRole1.getUser());
         }
         return users;
     }
 
-    /*public void addUser(User1 user) {
-        UserRole1 userRole1 = new UserRole1(user, this);
-        userRole1s.add(userRole1);
-    }*/
-
-    public void removeUser(User1 user) {
-        userRole1s.removeIf(userRole1 -> userRole1.getUser().equals(user));
+    public void addUser(User user) {
+        UserRole userRole1 = new UserRole(user, this);
+        userRoles.add(userRole1);
     }
 
-    public static org.example.models.Role1 createNewRole(String name) {
-        org.example.models.Role1 role = new org.example.models.Role1();
+    public void removeUser(User user) {
+        userRoles.removeIf(userRole -> userRole.getUser().equals(user));
+    }
+
+    public static org.example.model.Role createNewRole(String name) {
+        org.example.model.Role role = new org.example.model.Role();
         role.setName(name);
         return role;
     }

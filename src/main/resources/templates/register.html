@@ -23,10 +23,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">Пароль:</label>
-                            <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                            <label for="email" class="form-label">E-mail:</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="passwordHash" class="form-label">Пароль:</label>
+                            <input type="password" class="form-control" id="passwordHash" th:field="*{passwordHash}" required>
+                        </div>
+
+                        <!--
                         <div class="mb-3">
                             <label for="role" class="form-label">Роль:</label>
                             <select class="form-select" id="role" th:field="*{role.name}">
@@ -34,6 +40,7 @@
                                 <option value="ADMIN">Администратор</option>
                             </select>
                         </div>
+                        -->
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Зарегистрироваться</button>

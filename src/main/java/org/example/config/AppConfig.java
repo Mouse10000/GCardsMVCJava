@@ -38,7 +38,7 @@ public class AppConfig implements WebMvcConfigurer {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         try {
             dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            dataSource.setUrl("jdbc:mysql://localhost:3306/myshop?" +
+            dataSource.setUrl("jdbc:mysql://localhost:3306/collectionCards?" +
                     "useSSL=false&" +
                     "serverTimezone=UTC&" +
                     "allowPublicKeyRetrieval=true&" +

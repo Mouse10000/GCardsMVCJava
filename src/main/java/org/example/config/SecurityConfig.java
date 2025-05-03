@@ -30,13 +30,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
-                .usersByUsernameQuery("SELECT u.username, u.password, 'true' as enabled FROM users u WHERE u.username=?")
+                .usersByUsernameQuery("SELECT u.username, u.passwordHash, 'true' as enabled FROM user u WHERE u.username=?")
                 .authoritiesByUsernameQuery(
                         "SELECT u.username, r.name " +
-                        "FROM users u " +
-                        //"INNER JOIN user_role ur ON u.id = ur.user_id " +
-                        //"INNER JOIN roles r ON ur.role_id = r.id " +
-                        "INNER JOIN roles r ON u.role_id = r.id " +
+                        "FROM user u " +
+                        "INNER JOIN userRole ur ON u.id = ur.userId " +
+                        "INNER JOIN role r ON r.id = ur.roleId " +
+                        //"INNER JOIN roles r ON u.role_id = r.id " +
                         "WHERE u.username=?"
                 )
                 .passwordEncoder(passwordEncoder)

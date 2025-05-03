@@ -2,8 +2,10 @@ package org.example.services;
 
 import org.example.model.Role;
 import org.example.model.User;
+import org.example.model.UserRole;
 import org.example.repository.RoleRepository;
 import org.example.repository.UserRepository;
+import org.example.repository.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -21,18 +25,11 @@ public class UserService {
 
     public void registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        String roleName = user.getRole().getName();
-
-        Role role = roleRepository.findByName(roleName)
-                .orElseGet(() -> {
-                    Role newRole = new Role(roleName);
-                    return roleRepository.save(newRole);
-                });
-
-        user.setRole(role);
-
+        Role role = roleRepository.findByName("USER");
+        if (role == null) roleRepository.save(new Role("USER"));
         userRepository.save(user);
+        userRoleRepository.save(new UserRole(user, role));
+        user.addRole(role);
     }
 
     public User findByUsername(String username) {
