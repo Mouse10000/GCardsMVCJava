@@ -17,14 +17,14 @@ public class RegistrationController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
         if (userService.findByUsername(user.getUsername()) != null) {
             model.addAttribute("error", "Пользователь с таким именем уже существует");
-            return "register";
+            return "auth/register";
         }
         userService.registerUser(user);
         return "redirect:/login";
