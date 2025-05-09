@@ -1,8 +1,8 @@
 package org.example.services.Implementations;
 
-import org.example.models.Card;
-import org.example.dao.CardRepository;
-import org.example.services.Interface.CardService;
+import org.example.models.Card1;
+import org.example.dao.CardRepository1;
+import org.example.services.Interface.CardService1;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.Card.InvalidCardException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,29 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CardServiceImpl implements CardService {
+public class CardService1Impl implements CardService1 {
     @Autowired
-    private CardRepository cardRepository;
+    private CardRepository1 cardRepository1;
 
     @Override
-    public void addCard(Card card){
+    public void addCard(Card1 card1){
 
-        cardRepository.save(card);
+        cardRepository1.save(card1);
 
     }
 
     @Override
-    public Card getCardById(long cardId) throws CardNotFoundException {
+    public Card1 getCardById(long cardId) throws CardNotFoundException {
         return null;
     }
 
     @Override
-    public List<Card> getCardsByName(String name) throws CardNotFoundException {
+    public List<Card1> getCardsByName(String name) throws CardNotFoundException {
         return List.of();
     }
 
     @Override
-    public void updateCard(Card card) throws CardNotFoundException, InvalidCardException {
+    public void updateCard(Card1 card1) throws CardNotFoundException, InvalidCardException {
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<Card> getAllCards() {
+    public List<Card1> getAllCards() {
         return List.of();
     }
 }

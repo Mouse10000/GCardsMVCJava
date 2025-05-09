@@ -30,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
-                .usersByUsernameQuery("SELECT u.username, u.passwordHash, 'true' as enabled FROM user u WHERE u.username=?")
+                .usersByUsernameQuery("SELECT u.username, u.password, 'true' as enabled FROM user u WHERE u.username=?")
                 .authoritiesByUsernameQuery(
                         "SELECT u.username, r.name " +
                         "FROM user u " +
@@ -47,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/cards").permitAll()
+                .antMatchers("/home").permitAll()
                 .antMatchers("/register").permitAll()
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .antMatchers("/profile").authenticated()

@@ -1,4 +1,4 @@
-package org.example.controllers;
+package org.example.controllers.auth;
 
 import org.example.model.User;
 import org.example.services.AdminService;

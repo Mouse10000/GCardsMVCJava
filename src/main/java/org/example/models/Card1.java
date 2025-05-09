@@ -3,9 +3,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-@Entity(name = "Card")
-@Table(name = "card")
-public class Card {
+@Entity(name = "Card1")
+@Table(name = "card1")
+public class Card1 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class Card {
     @Column(nullable = true)
     private String Image;
 
-    public Card() {}
+    public Card1() {}
 
     public String getName() {
         return name;
@@ -38,7 +38,7 @@ public class Card {
         this.name = name;
     }
 
-    public Card(Long id, String name, LocalDateTime dateOfAdd, String cardRank, int number, String description, String image) {
+    public Card1(Long id, String name, LocalDateTime dateOfAdd, String cardRank, int number, String description, String image) {
         this.id = id;
         this.name = name;
         DateOfAdd = LocalDateTime.now();
