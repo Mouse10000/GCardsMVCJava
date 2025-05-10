@@ -51,7 +51,7 @@ public class CardController {
     public String deleteCard(@PathVariable Long id) {
         try {
             cardService.deleteCard(id);
-            return "cards";
+            return "cards/list";
         } catch (CardNotFoundException e) {
             throw new RuntimeException(e);
         }

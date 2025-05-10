@@ -6,9 +6,13 @@ import org.example.model.UserRole;
 import org.example.repository.RoleRepository;
 import org.example.repository.UserRepository;
 import org.example.repository.UserRoleRepository;
+import org.example.services.Interface.Exception.User.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,6 +34,11 @@ public class UserService {
         userRepository.save(user);
         userRoleRepository.save(new UserRole(user, role));
         user.addRole(role);
+    }
+    public List<User> getAllUsersWithoutOne(String username) throws UserNotFoundException {
+        Optional<User> userSender = userRepository.findByUsername(username);
+        if (userSender.isEmpty()) throw new UserNotFoundException("User Recipient not found");
+        return userRepository.findAllByUsernameNot(username);
     }
 
     public User findByUsername(String username) {

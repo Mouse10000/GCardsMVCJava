@@ -55,15 +55,15 @@ public class Role {
 
     public Set<User> getUsers() {
         Set<User> users = new HashSet<>();
-        for (UserRole userRole1 : userRoles) {
-            users.add(userRole1.getUser());
+        for (UserRole userRole : userRoles) {
+            users.add(userRole.getUser());
         }
         return users;
     }
 
     public void addUser(User user) {
-        UserRole userRole1 = new UserRole(user, this);
-        userRoles.add(userRole1);
+        UserRole userRole = new UserRole(user, this);
+        userRoles.add(userRole);
     }
 
     public void removeUser(User user) {

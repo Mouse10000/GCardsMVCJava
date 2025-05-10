@@ -9,10 +9,6 @@
 <div class="container mt-4"  th:fragment="content">
     <h1 class="mb-4">Список карточек</h1>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-
-    <a  th:href="@{/cards/add}" class="btn btn-success mb-3">Добавить новую карточку</a>
-
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">

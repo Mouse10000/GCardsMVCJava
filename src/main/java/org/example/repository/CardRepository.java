@@ -19,4 +19,5 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     Page<Card> findAll(Pageable pageable); // Стандартный метод
 
     Card getCardByNumber(int number);
+
 }

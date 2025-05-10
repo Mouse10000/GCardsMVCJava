@@ -17,7 +17,7 @@ public class UserCard {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "cardId", insertable = false, updatable = false)
+    @JoinColumn(name = "СardId")
     private Card card;
 
     private int CountDuplicate;
@@ -80,26 +80,26 @@ public class UserCard {
     public static class UserCardId implements Serializable {
         private static final long serialVersionUID = -4135407811430541370L;
 
-        @Column(name = "userId")
-        private Long userId;
+        @Column(name = "UserId")
+        private Long UserId;
 
-        @Column(name = "cardId")
+        @Column(name = "CardId")
         private Long cardId;
 
         public UserCardId() {
         }
 
         public UserCardId(Long userId, Long cardId) {
-            this.userId = userId;
+            this.UserId = userId;
             this.cardId = cardId;
         }
 
         public Long getUserRoleId() {
-            return userId;
+            return UserId;
         }
 
         public void setUserRoleId(Long userId) {
-            this.userId = userId;
+            this.UserId = userId;
         }
 
         public Long getCardId() {
@@ -115,13 +115,13 @@ public class UserCard {
             if (this == o) return true;
             if (!(o instanceof UserCardId)) return false;
             UserCardId that = (UserCardId) o;
-            return Objects.equals(userId, that.userId) &&
+            return Objects.equals(UserId, that.UserId) &&
                     Objects.equals(cardId, that.cardId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(userId, cardId);
+            return Objects.hash(UserId, cardId);
         }
     }
 }

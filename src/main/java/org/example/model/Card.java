@@ -1,7 +1,10 @@
 package org.example.model;
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity(name = "Card")
 @Table(name = "card")
@@ -23,6 +26,9 @@ public class Card {
     private String description;
     @Column(nullable = true)
     private String image;
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserCard> userCards = new ArrayList<>();
 
     public Card() {}
 
