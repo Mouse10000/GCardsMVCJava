@@ -39,10 +39,11 @@ public class TradeController {
         List<Trade> tradesSender = null;
         List<Trade> tradesRecipient = null;
         List<Trade> completedTrades = null;
+        String username = user.getUsername();
         try {
-            tradesSender = tradeService.getTradesByUserSender(user.getUsername());
-            tradesRecipient = tradeService.getTradesByUserRecipient(user.getUsername());
-            completedTrades = tradeService.getTradesCompleted(user.getUsername());
+            tradesSender = tradeService.getTradesByUserSender(username);
+            tradesRecipient = tradeService.getTradesByUserRecipient(username);
+            completedTrades = tradeService.getTradesCompleted(username);
         } catch (UserNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -122,11 +123,11 @@ public class TradeController {
         try {
             org.example.model.User userRecipient = tradeService.getUser(tradeId, "recipient");
             model.addAttribute("userCards",
-                    userCardService.getAllUserCards(userRecipient.getUsername()));
+                    tradeService.getRecipientCardsNotInTrade(tradeId));
             model.addAttribute("userRecipientCards",
                     tradeService.getRecipientCards(tradeId));
             model.addAttribute("tradeId", tradeId);
-        } catch (UserNotFoundException | TradeNotFoundException e) {
+        } catch (UserNotFoundException | TradeNotFoundException | CardNotFoundException e) {
             throw new RuntimeException(e);
         }
         return "trades/form-recipient-cards";
@@ -153,13 +154,23 @@ public class TradeController {
     }
 
     @GetMapping("/details/{id}")
-    public String editTrade(Model model, @PathVariable Long id){
+    public String editTrade(Model model, @PathVariable Long id,
+                            @AuthenticationPrincipal User user) {
         try {
             model.addAttribute("userSenderCards",
                     tradeService.getSenderCards(id));
             model.addAttribute("userRecipientCards",
                     tradeService.getRecipientCards(id));
+
+            Trade trade = tradeService.getTradeById(id);
             model.addAttribute("tradeId", id);
+
+            model.addAttribute("tradePost", tradeService.tradePosted(id));
+            model.addAttribute("tradeCompleted", tradeService.tradeCompleted(id));
+
+            Boolean userIsRecipient = trade.getUserRecipient().getUsername().equals(user.getUsername());
+            model.addAttribute("userIsRecipient", userIsRecipient);
+
         } catch (TradeNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -183,6 +194,46 @@ public class TradeController {
             tradeService.createTrade(id);
         } catch (UserNotFoundException | TradeException | CardNotFoundException e) {
             throw new RuntimeException(e);
+        }
+        return "redirect:/trades";
+    }
+
+    @GetMapping("/submit/{id}")
+    public String submitTrade(@PathVariable Long id,
+                              @AuthenticationPrincipal User user){
+        Trade trade = null;
+        try {
+            trade = tradeService.getTradeById(id);
+        } catch (TradeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        boolean userIsRecipient = trade.getUserRecipient().getUsername().equals(user.getUsername());
+        if(userIsRecipient){
+            try {
+                tradeService.submitTrade(id);
+            } catch (TradeException | UserNotFoundException | CardNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return "redirect:/trades";
+    }
+    @GetMapping("/cancel/{id}")
+    public String cancelTrade(@PathVariable Long id,
+                              @AuthenticationPrincipal User user){
+        Trade trade = null;
+        try {
+            trade = tradeService.getTradeById(id);
+        } catch (TradeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        boolean userIsRecipient = trade.getUserRecipient().getUsername().equals(user.getUsername());
+        if(userIsRecipient){
+            try {
+                tradeService.cancelTrade(id);
+            } catch (TradeException | UserNotFoundException | CardNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
         return "redirect:/trades";
     }

@@ -27,4 +27,5 @@ public interface CardSenderRepository  extends JpaRepository<CardSender, Long> {
     @Modifying
     @Query("DELETE FROM CardSender cs WHERE cs.trade = :trade AND cs.card = :card")
     void deleteByTradeAndCard(@Param("trade") Trade trade, @Param("card") Card card);
+
 }

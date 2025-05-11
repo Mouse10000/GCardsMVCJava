@@ -26,10 +26,16 @@ public interface TradeServiceInterface {
     void deleteRecipientCard(Long tradeId, Long cardId)
             throws TradeNotFoundException, UserNotFoundException, CardNotFoundException;
     List<Card> getRecipientCards(Long tradeId) throws  TradeNotFoundException;
+    List<Card> getRecipientCardsNotInTrade(Long tradeId) throws TradeNotFoundException, CardNotFoundException, UserNotFoundException;
 
     void createTrade(Long tradeId) throws TradeException, CardNotFoundException, UserNotFoundException;
+    void submitTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException;
+    void cancelTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException;
+
     void updateTradeState(long tradeId, String state) throws TradeNotFoundException, InvalidTradeStateException, UserNotFoundException;
     Trade getTradeById(long tradeId) throws TradeNotFoundException;
+    Boolean tradePosted(long tradeId) throws TradeNotFoundException;
+    Boolean tradeCompleted(long tradeId) throws TradeNotFoundException;
 
     List<Trade> getTradesByUserSender(String username) throws UserNotFoundException;
     List<Trade> getTradesByUserRecipient(String username) throws UserNotFoundException;

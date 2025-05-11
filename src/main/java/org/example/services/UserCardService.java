@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.model.Card;
+import org.example.model.Trade;
 import org.example.model.User;
 import org.example.model.UserCard;
 import org.example.repository.CardRepository;
@@ -36,6 +37,13 @@ public class UserCardService implements UserCardInterface {
     }
 
     @Override
+    public void addUserCards(String userName, List<Card> cards) throws CardNotFoundException, UserNotFoundException {
+        for (Card card : cards) {
+            addUserCard(userName, card.getId());
+        }
+    }
+
+    @Override
     public List<Card> getCardsByName(String name) throws CardNotFoundException {
         return List.of();
     }
@@ -49,6 +57,13 @@ public class UserCardService implements UserCardInterface {
 
         UserCard userCard = new UserCard(userBase.get(), cardBase.get(), 0);
         userCardRepository.delete(userCard);
+    }
+
+    @Override
+    public void removeUserCards(String userName, List<Card> cards) throws CardNotFoundException, UserNotFoundException {
+        for (Card card : cards) {
+            removeUserCard(userName, card.getId());
+        }
     }
 
     @Override

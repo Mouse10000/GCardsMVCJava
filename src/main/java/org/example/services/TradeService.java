@@ -107,10 +107,10 @@ public class TradeService implements TradeServiceInterface {
         if (cardBase.isEmpty())
             throw new CardNotFoundException("Card with id " + cardId + " not found");
 
-        userCardService.removeUserCard(userRecipient.get().getUsername(), cardBase.get().getId());
+        //userCardService.removeUserCard(userRecipient.get().getUsername(), cardBase.get().getId());
         cardRecipientRepository.save(new CardRecipient(trade.get(), cardBase.get()));
         try {
-            updateTradeState(tradeId, "setRecipientCards");
+            updateTradeState(tradeId, "setUserRecipientCard");
         } catch (InvalidTradeStateException e) {
             throw new RuntimeException(e);
         }
@@ -128,11 +128,11 @@ public class TradeService implements TradeServiceInterface {
         if (cardBase.isEmpty())
             throw new CardNotFoundException("Card with id " + cardId + " not found");
 
-        userCardService.addUserCard(userRecipient.get().getUsername(), cardBase.get().getId());
+        //userCardService.addUserCard(userRecipient.get().getUsername(), cardBase.get().getId());
 
         cardRecipientRepository.deleteByTradeAndCard(tradeBase.get(), cardBase.get());
         try {
-            updateTradeState(tradeId, "setUserSenderCard");
+            updateTradeState(tradeId, "setUserRecipientCard");
         } catch (InvalidTradeStateException e) {
             throw new RuntimeException(e);
         }
@@ -147,10 +147,50 @@ public class TradeService implements TradeServiceInterface {
     }
 
     @Override
+    public List<Card> getRecipientCardsNotInTrade(Long tradeId) throws TradeNotFoundException, CardNotFoundException, UserNotFoundException {
+        Optional<Trade> trade = tradeRepository.findById(tradeId);
+        if (trade.isEmpty()) throw new TradeNotFoundException("Trade not found");
+        User userRecipient = getUser(tradeId, "recipient");
+
+        return cardRecipientRepository.findUserCardsNotInTrade(userRecipient, trade.get());
+    }
+
+    @Override
     public void createTrade(Long tradeId) throws TradeException, CardNotFoundException, UserNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
         if (trade.isEmpty()) throw new TradeNotFoundException("Trade not found");
         updateTradeState(tradeId, "post");
+    }
+
+    @Override
+    public void submitTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException {
+        Optional<Trade> trade = tradeRepository.findById(tradeId);
+        if (trade.isEmpty()) throw new TradeNotFoundException("Trade not found");
+
+        List<Card> cardsSender = cardSenderRepository.getCardSenderByTrade(trade.get());
+        List<Card> cardsRecipient = cardRecipientRepository.getCardRecipientByTrade(trade.get());
+        String userSender = trade.get().getUserSender().getUsername();
+        String userRecipient = trade.get().getUserRecipient().getUsername();
+
+        userCardService.removeUserCards(userRecipient, cardsRecipient);
+        userCardService.addUserCards(userSender, cardsRecipient);
+
+        userCardService.addUserCards(userRecipient, cardsSender);
+
+        updateTradeState(tradeId, "completedSuccess");
+    }
+
+    @Override
+    public void cancelTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException {
+        Optional<Trade> trade = tradeRepository.findById(tradeId);
+        if (trade.isEmpty()) throw new TradeNotFoundException("Trade not found");
+
+
+        String userSender = trade.get().getUserSender().getUsername();
+        List<Card> cardsSender = cardSenderRepository.getCardSenderByTrade(trade.get());
+        userCardService.addUserCards(userSender, cardsSender);
+
+        updateTradeState(tradeId, "completedCancel");
     }
 
     @Override
@@ -169,7 +209,26 @@ public class TradeService implements TradeServiceInterface {
 
     @Override
     public Trade getTradeById(long tradeId) throws TradeNotFoundException {
-        return null;
+        Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
+        if (tradeBase.isEmpty()) throw new TradeNotFoundException("Trade not found");
+
+        return tradeBase.get();
+    }
+
+    @Override
+    public Boolean tradePosted(long tradeId) throws TradeNotFoundException {
+        Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
+        if (tradeBase.isEmpty()) throw new TradeNotFoundException("Trade not found");
+
+        return tradeBase.get().getState().equals("post");
+    }
+
+    @Override
+    public Boolean tradeCompleted(long tradeId) throws TradeNotFoundException {
+        Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
+        if (tradeBase.isEmpty()) throw new TradeNotFoundException("Trade not found");
+
+        return tradeBase.get().getState().contains("completed");
     }
 
     @Override
@@ -177,7 +236,7 @@ public class TradeService implements TradeServiceInterface {
         Optional<User> userBase = userRepository.findByUsername(username);
         if (userBase.isEmpty()) throw new UserNotFoundException("User not found");
 
-        return tradeRepository.getTradesByUserSenderAndStateNot(userBase.get(), "completed");
+        return tradeRepository.findTradesByUserSender(userBase.get(), "completed");
     }
 
     @Override
@@ -185,7 +244,7 @@ public class TradeService implements TradeServiceInterface {
         Optional<User> userBase = userRepository.findByUsername(username);
         if (userBase.isEmpty()) throw new UserNotFoundException("User not found");
 
-        return tradeRepository.getTradesByUserRecipientAndStateNot(userBase.get(),"completed");
+        return tradeRepository.findTradesByUserRecipient(userBase.get(),"completed");
     }
 
     @Override
@@ -193,13 +252,14 @@ public class TradeService implements TradeServiceInterface {
         Optional<User> userBase = userRepository.findByUsername(username);
         if (userBase.isEmpty()) throw new UserNotFoundException("User not found");
 
-        return tradeRepository.findAllByState("complete");
+        return tradeRepository.findAllByUserAndStateContains(
+                userBase.get(), "complete");
     }
 
     @Override
     public User getUser(Long tradeId, String type) throws UserNotFoundException, TradeNotFoundException {
         Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
-        if (tradeBase.isEmpty()) throw new UserNotFoundException("Trade not found");
+        if (tradeBase.isEmpty()) throw new TradeNotFoundException("Trade not found");
 
         if(Objects.equals(type, "recipient"))
             return tradeBase.get().getUserRecipient();
@@ -211,6 +271,12 @@ public class TradeService implements TradeServiceInterface {
     public void deleteTrade(long tradeId) throws TradeNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
         if (trade.isEmpty()) throw new TradeNotFoundException("Trade not found");
+        List<Card> cardsSender = cardSenderRepository.getCardSenderByTrade(trade.get());
+        try {
+            userCardService.addUserCards(trade.get().getUserSender().getUsername(), cardsSender);
+        } catch (CardNotFoundException | UserNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         tradeRepository.deleteById(tradeId);
     }
 }

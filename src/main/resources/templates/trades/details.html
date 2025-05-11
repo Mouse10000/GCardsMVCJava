@@ -9,7 +9,8 @@
 <div class="container mt-4" th:fragment="content">
     <h1 class="mb-4">Детали обмена</h1>
 
-    <h4>Ваши карточки, участвующие в обмене</h4>
+    <h4 th:if="${!userIsRecipient}">Ваши карточки, участвующие в обмене</h4>
+    <h4 th:if="${userIsRecipient}">Карточки, которые вы получите</h4>
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -29,7 +30,8 @@
         </table>
     </div>
 
-    <h4>Карточки, которые вы за них получите</h4>
+    <h4 th:if="${!userIsRecipient}">Карточки, которые вы за них получите</h4>
+    <h4 th:if="${userIsRecipient}">Ваши карточки, участвующие в обмене</h4>
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -49,22 +51,39 @@
         </table>
     </div>
 
-    <a th:href="@{/trades/form-sender-cards/{tradeId}(tradeId=${tradeId})}" class="btn btn-success mb-3">
+    <a th:href="@{/trades/form-sender-cards/{tradeId}(tradeId=${tradeId})}" class="btn btn-success mb-3"
+       th:if="${!(tradePost or tradeCompleted)}">
         Выбрать карты для отправки
     </a>
-    <a th:href="@{/trades/form-recipient-cards/{tradeId}(tradeId=${tradeId})}" class="btn btn-success mb-3">
+    <a th:href="@{/trades/form-recipient-cards/{tradeId}(tradeId=${tradeId})}" class="btn btn-success mb-3"
+       th:if="${!(tradePost or tradeCompleted)}">
         Выбрать карты, которые вы получите
     </a>
     <a th:href="@{/trades/post-trade/{tradeId}(tradeId=${tradeId})}" class="btn btn-success mb-3"
-       onclick="return confirm('Вы уверены?')">
+       th:if="${!(tradePost or tradeCompleted)}"
+       onclick="return confirm('Вы точно хотите отправить обмен?' +
+        'После отправки изменить или удалить его будет нельзя')">
         Отправить предложение обмена
     </a>
 
     <a th:href="@{/trades/delete/{id}(id=${tradeId})}" class="btn btn-success mb-3"
+       th:if="${!(tradePost or tradeCompleted)}"
        onclick="return confirm('Вы уверены?')">
         Удалить обмен
     </a>
-    <a th:href="@{/trades}" class="btn btn-success mb-3">Закончу позже</a>
+
+
+    <a th:href="@{/trades/submit/{id}(id=${tradeId})}" class="btn btn-success mb-3"
+       th:if="${userIsRecipient and !tradeCompleted}"
+       onclick="return confirm('Подтвердите действие')">
+        Принять обмен
+    </a>
+    <a th:href="@{/trades/cancel/{id}(id=${tradeId})}" class="btn btn-success mb-3"
+       th:if="${userIsRecipient and !tradeCompleted}"
+       onclick="return confirm('Подтвердите действие')">
+        Отклонить обмен
+    </a>
+    <a th:href="@{/trades}" class="btn btn-success mb-3">Назад к обменам</a>
 
 </div>
 </body>

@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.model.Card;
+import org.example.model.Trade;
 import org.example.model.User;
 import org.example.model.UserCard;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +16,8 @@ public interface UserCardRepository extends JpaRepository<UserCard, UserCard.Use
 
     @Query("SELECT uc.card FROM UserCard uc WHERE uc.user = :user")
     List<Card> findCardsByUser(@Param("user") User user);
+
+    @Query("SELECT uc.card FROM UserCard uc INNER JOIN CardRecipient cs WHERE cs.trade = :trade")
+    List<Card> getUserRecipientCardsByTrade(@Param("trade") Trade trade);
 
 }
