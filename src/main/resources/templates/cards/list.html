@@ -22,6 +22,7 @@
                 <th>Ранг</th>
                 <th>Номер</th>
                 <th>Дата добавления</th>
+                <th>Изображение</th>
                 <th>Действия</th>
             </tr>
             </thead>
@@ -33,6 +34,14 @@
                 <td th:text="${card.number}"></td>
                 <td th:text="${#temporals.format(card.dateOfAdd, 'dd.MM.yyyy HH:mm')}"></td>
                 <td>
+                    <img th:src="@{'/image/' + ${card.image}}"
+                         style="max-width: 300px; max-height: 300px;"/>
+                    <hr>
+                </td>
+                <td>
+                    <a th:href="@{/image/upload/{cardId}(cardId=${card.id})}"
+                       class="btn btn-sm btn-primary">Добавить изображение</a>
+
                     <a th:href="@{/user-cards/add/{id}(id=${card.id})}"
                        class="btn btn-sm btn-primary"
                        onclick="return confirm('Вы уверены?')">Добавить на аккаунт</a>
