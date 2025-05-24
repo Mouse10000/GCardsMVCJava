@@ -25,7 +25,7 @@ public class CardController {
         //List<Card> cards = cardService.getCardsOnPage(page);
         List<Card> cards = cardService.getAllCards();
         model.addAttribute("cards", cards);
-        return "cards/list";
+        return "cards/index";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -80,6 +80,15 @@ public class CardController {
         }
 
         return "redirect:/cards";
+    }
+    @GetMapping("/details/{id}")
+    public String showOneCard(@PathVariable Long id, Model model){
+        try {
+            model.addAttribute("card", cardService.getCardById(id));
+        } catch (CardNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return "cards/details";
     }
 }
 

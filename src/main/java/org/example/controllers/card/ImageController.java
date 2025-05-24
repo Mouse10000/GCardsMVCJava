@@ -34,7 +34,7 @@ public class ImageController {
         return "cards/uploadImage";
     }
 
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/upload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file,
                                    @RequestParam("cardId") Long cardId,

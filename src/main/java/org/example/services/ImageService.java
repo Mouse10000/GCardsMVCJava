@@ -38,7 +38,7 @@ public class ImageService implements ImageServiceInterface {
         }
 
         String uuidFile = UUID.randomUUID().toString();
-        String resultFilename = uuidFile + "." + image.getOriginalFilename();
+        String resultFilename = image.getOriginalFilename();
 
         image.transferTo(new File(uploadPath + "/" + resultFilename));
 
@@ -53,10 +53,6 @@ public class ImageService implements ImageServiceInterface {
         cardRepository.save(cardToAdd);
     }
 
-    @Override
-    public void updateImageOfCard(Long cardId, MultipartFile image) {
-
-    }
 
     @Override
     public Resource getImageOfCard(Long cardId) {

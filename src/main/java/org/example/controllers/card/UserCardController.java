@@ -41,7 +41,7 @@ public class UserCardController {
             throw new RuntimeException(e);
         }
 
-        return "user-cards/list";
+        return "user-cards/index";
     }
 
     @GetMapping("/add/{id}")

@@ -18,6 +18,7 @@
                 <th>Название</th>
                 <th>Ранг</th>
                 <th>Номер</th>
+                <th>Картинка</th>
             </tr>
             </thead>
             <tbody>
@@ -25,6 +26,10 @@
                 <td th:text="${card.name}"></td>
                 <td th:text="${card.cardRank}"></td>
                 <td th:text="${card.number}"></td>
+                <td>
+                    <img th:src="@{'/image/' + ${card.image}}"
+                         style="max-width: 50px;" alt=""/>
+                </td>
             </tr>
             </tbody>
         </table>
