@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.model.Card;
+import org.example.model.dto.CardFilter;
 import org.example.repository.CardRepository;
 import org.example.repository.UserCardRepository;
 import org.example.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,41 @@ public class CardService implements CardServiceInterface {
     private CardRepository cardRepository;
     @Autowired
     private UserCardRepository userCardRepository;
+
+    //@Override
+    public Page<Card> getAllCards(Pageable pageable) {
+        return cardRepository.findAll(pageable);
+    }
+
+    //@Override
+    public Page<Card> findByNameContaining(String name, Pageable pageable) {
+        return cardRepository.findByNameContainingIgnoreCase(name, pageable);
+    }
+
+    //@Override
+    public Page<Card> findByFilter(CardFilter filter, Pageable pageable) {
+        Specification<Card> spec = Specification.where(null);
+
+        if (filter.getName() != null && !filter.getName().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("name")), "%" + filter.getName().toLowerCase() + "%"));
+        }
+
+        if (filter.getMinNumber() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("number"), filter.getMinNumber()));
+        }
+
+        if (filter.getMaxNumber() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("number"), filter.getMaxNumber()));
+        }
+
+        return cardRepository.findAll(spec, pageable);
+    }
+    public Page<Card> search(String query, Pageable pageable) {
+        return cardRepository.search(query, pageable);
+    }
 
     @Override
     public void addCard(Card card) throws DuplicateCardException, InvalidCardException {
