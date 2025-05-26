@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * Управляет процессом создания новых учетных записей и валидацией данных.
  */
 @Controller
-@RequestMapping("/registration")
+@RequestMapping("/register")
 public class RegistrationController {
     @Autowired
     private UserService userService;

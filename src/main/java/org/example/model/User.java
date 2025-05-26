@@ -9,7 +9,7 @@ import java.util.Set;
  * Представляет информацию о пользователе, включая его учетные данные и личную информацию.
  */
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User {
     /**
      * Уникальный идентификатор пользователя
