@@ -15,6 +15,13 @@
             <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 
             <form th:action="@{/cards/add}" th:object="${card}" method="post">
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <input type="hidden" name="size" th:value="${pageSize}">
+                <input type="hidden" name="sort" th:value="${sort}">
+                <input type="hidden" name="query" th:value="${query}">
+                <input type="hidden" name="rank" th:value="${rank}">
+                <input type="hidden" name="minNumber" th:value="${minNumber}">
+                <input type="hidden" name="maxNumber" th:value="${maxNumber}">
                 <div class="mb-3">
                     <label for="name" class="form-label">Название</label>
                     <input type="text" class="form-control" id="name" th:field="*{name}" required>
@@ -27,7 +34,12 @@
 
                 <div class="mb-3">
                     <label for="rank" class="form-label">Ранг</label>
-                    <input type="text" class="form-control" id="rank" th:field="*{cardRank}">
+                    <select name="rank" class="form-control" id="rank" th:field="*{cardRank}">
+                        <option th:value="${'R'}">R</option>
+                        <option th:value="${'SR'}">SR</option>
+                        <option th:value="${'SSR'}">SSR</option>
+                        <option th:value="${'UR'}">UR</option>
+                    </select>
                 </div>
 
                 <div class="mb-3">

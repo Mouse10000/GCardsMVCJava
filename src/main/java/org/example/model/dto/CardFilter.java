@@ -1,18 +1,24 @@
 package org.example.model.dto;
 
 public class CardFilter {
-    private String name;
+    private String rank;
     private Integer minNumber;
     private Integer maxNumber;
     // другие поля по необходимости
 
 
-    public String getName() {
-        return name;
+    public CardFilter(String rank, Integer minNumber, Integer maxNumber) {
+        this.rank = rank;
+        this.minNumber = minNumber;
+        this.maxNumber = maxNumber;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 
     public Integer getMinNumber() {
@@ -32,7 +38,7 @@ public class CardFilter {
     }
 
     public boolean isEmpty() {
-        return (name == null || name.isEmpty())
+        return (rank == null || rank.isEmpty())
                 && minNumber == null
                 && maxNumber == null;
     }

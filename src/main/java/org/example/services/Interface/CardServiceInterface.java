@@ -9,11 +9,10 @@ import java.util.List;
 
 public interface CardServiceInterface {
     void addCard(Card card) throws DuplicateCardException, InvalidCardException;
-    Card getCardById(long cardId) throws CardNotFoundException;
+    Boolean CardByNumberAndCardRankIsNull(int number, String cardRank);
     List<Card> getCardsByName(String name) throws CardNotFoundException;
-    void updateCard(Card card) throws CardNotFoundException, InvalidCardException;
+    void updateCard(Card card) throws CardNotFoundException, InvalidCardException, DuplicateCardException;
     void deleteCard(long cardId) throws CardNotFoundException;
     List<Card> getAllCards();
     List<Card> getCardsOnPage(int page) throws CardNotFoundException;
-    Card getCardByNumber(int number);
 }

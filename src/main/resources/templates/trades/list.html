@@ -21,7 +21,12 @@
             <tbody>
             <tr th:each="trade : ${yourTrades}">
                 <td th:text="${trade.userRecipient.username}"></td>
-                <td th:text="${trade.state}"></td>
+                <td th:if="${trade.state == 'init'}">Добавление пользователя</td>
+                <td th:if="${trade.state == 'setUserSenderCard'}">Назначение ваших карточек</td>
+                <td th:if="${trade.state == 'setUserRecipientCard'}">
+                    Назначение карточек, которые вы получите
+                </td>
+                <td th:if="${trade.state == 'post'}">Отправлен</td>
                 <td>
                     <a th:href="@{/trades/details/{id}(id=${trade.id})}"
                        class="btn btn-sm btn-primary me-1">Детали</a>
@@ -43,7 +48,6 @@
             <tbody>
             <tr th:each="trade : ${tradesForYour}">
                 <td th:text="${trade.userSender.username}"></td>
-                <td th:text="${trade.state}"></td>
                 <td>
                     <a th:href="@{/trades/details/{id}(id=${trade.id})}"
                        class="btn btn-sm btn-primary me-1">Детали</a>
@@ -67,10 +71,15 @@
             <tr th:each="trade : ${completedTrades}">
                 <td th:text="${trade.userRecipient.username}"></td>
                 <td th:text="${trade.userSender.username}"></td>
-                <td th:text="${trade.state}"></td>
+                <td th:if="${trade.state == 'completedSuccess'}">Успешно завершён</td>
+                <td th:if="${trade.state == 'completedCancel'}">Отклонён</td>
                 <td>
                     <a th:href="@{/trades/details/{id}(id=${trade.id})}"
                        class="btn btn-sm btn-primary me-1">Детали</a>
+
+                    <a th:href="@{/trades/delete/{id}(id=${trade.id})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Вы уверены?')">Удалить</a>
                 </td>
             </tr>
             </tbody>

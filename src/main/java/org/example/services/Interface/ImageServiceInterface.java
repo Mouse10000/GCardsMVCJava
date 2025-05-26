@@ -8,4 +8,5 @@ import java.io.IOException;
 public interface ImageServiceInterface {
     void addImageToCard(Long cardId, MultipartFile image) throws IOException;
     Resource getImageOfCard(Long cardId);
+
 }

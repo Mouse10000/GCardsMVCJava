@@ -11,59 +11,102 @@
     <h1 class="mb-4">Список карточек</h1>
 
 
-    <a th:href="@{/cards/add}" class="btn btn-primary mb-3">
+    <a th:href="@{/cards/add}" class="btn btn-primary mb-3" sec:authorize="hasAuthority('ADMIN')">
         Добавить новую карточку в бд
     </a>
-    <!-- Форма поиска и фильтрации -->
+
+    <!-- Форма поиска -->
+    <form th:action="@{/cards}" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="hidden" name="rank" th:value="${rank}">
+            <input type="hidden" name="maxNumber" th:value="${maxNumber}">
+            <input type="hidden" name="minNumber" th:value="${minNumber}">
+            <input type="hidden" name="sort" th:value="${sort}">
+            <input type="text" name="query" th:value="${query}" class="form-control" placeholder="Поиск...">
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="submit">Поиск</button>
+            </div>
+        </div>
+    </form>
+    <!-- Значки -->
+    <div class="row">
+        <div class="col-md-3">
+            Имя
+            <span th:if="${sort == 'name,asc'}">↑</span>
+            <span th:if="${sort == 'name,desc'}">↓</span>
+        </div>
+        <div class="col-md-3">
+            Номер
+            <span th:if="${sort == 'number,asc'}">↑</span>
+            <span th:if="${sort == 'number,desc'}">↓</span>
+        </div>
+        <div class="col-md-3">
+            Ранг
+            <span th:if="${sort == 'cardRank,asc'}">↑</span>
+            <span th:if="${sort == 'cardRank,desc'}">↓</span>
+        </div>
+    </div>
     <!-- Форма сортировки -->
     <div class="row mb-4">
         <div class="col-md-3">
             <form th:action="@{/cards}" method="get">
-                <input type="hidden" name="sort" th:value="${sort}">
-                <input type="hidden" name="page" th:value="${currentPage}">
-                <input type="hidden" name="size" th:value="${pageSize}">
-                <input type="hidden" name="name" th:value="${name}">
-                <input type="hidden" name="filter" th:value="${filter}">
+                <input type="hidden" name="query" th:value="${query}">
+                <input type="hidden" name="rank" th:value="${rank}">
+                <input type="hidden" name="maxNumber" th:value="${maxNumber}">
+                <input type="hidden" name="minNumber" th:value="${minNumber}">
 
                 <div class="input-group">
                     <select name="sort" class="form-control" onchange="this.form.submit()">
                         <option th:value="${'name,asc'}" th:selected="${sort == 'name,asc'}">Имя (А-Я)</option>
                         <option th:value="${'name,desc'}" th:selected="${sort == 'name,desc'}">Имя (Я-А)</option>
-                        <option th:value="${'number,asc'}" th:selected="${sort == 'number,asc'}">Номер (по возрастанию)</option>
-                        <option th:value="${'number,desc'}" th:selected="${sort == 'number,desc'}">Номер (по убыванию)</option>
+                        <option th:value="${'number,asc'}" th:selected="${sort == 'number,asc'}">
+                            Номер (по возрастанию)
+                        </option>
+                        <option th:value="${'number,desc'}" th:selected="${sort == 'number,desc'}">
+                            Номер (по убыванию)
+                        </option>
+                        <option th:value="${'cardRank,asc'}" th:selected="${sort == 'cardRank,asc'}">
+                            Ранг R-SR-SSR-UR
+                        </option>
+                        <option th:value="${'cardRank,desc'}" th:selected="${sort == 'cardRank,desc'}">
+                            Ранг UR-SSR-SR-R
+                        </option>
                     </select>
                 </div>
             </form>
         </div>
     </div>
-
-    <form th:action="@{/cards/search}" method="get" class="mb-4">
-        <div class="input-group">
+    <!-- Форма фильтрации -->
+    <form th:action="@{/cards}" method="get" class="mb-4">
+        <div class="row">
+            <input type="hidden" name="query" th:value="${query}">
             <input type="hidden" name="sort" th:value="${sort}">
-            <input type="text" name="query" th:value="${query}" class="form-control" placeholder="Search...">
-            <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="submit">Search</button>
+            <div class="input-group">
+                <select class="form-control" name="rank" th:value="${rank}">
+                    <option th:value="${'R'}" th:selected="${rank == 'R'}">R</option>
+                    <option th:value="${'SR'}" th:selected="${rank == 'SR'}">SR</option>
+                    <option th:value="${'SSR'}" th:selected="${rank == 'SSR'}">SSR</option>
+                    <option th:value="${'UR'}" th:selected="${rank == 'UR'}">UR</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="minNumber" th:value="${minNumber}"
+                       class="form-control" placeholder="Min number">
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="maxNumber" th:value="${maxNumber}"
+                       class="form-control" placeholder="Max number">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a th:href="@{/cards}" class="btn btn-secondary">Reset</a>
             </div>
         </div>
     </form>
-    <div class="row">
-        <div class="col-md-3">
-            <a th:href="@{/cards(page=1, size=${pageSize}, name=${name}, filter=${filter}, sort='name,' + (sort == 'name,asc' ? 'desc' : 'asc'))}">
-                Имя
-                <span th:if="${sort == 'name,asc'}">↑</span>
-                <span th:if="${sort == 'name,desc'}">↓</span>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a th:href="@{/cards(page=1, size=${pageSize}, name=${name}, filter=${filter}, sort='number,' + (sort == 'number,asc' ? 'desc' : 'asc'))}">
-                Номер
-                <span th:if="${sort == 'number,asc'}">↑</span>
-                <span th:if="${sort == 'number,desc'}">↓</span>
-            </a>
-        </div>
-    </div>
+
     <div class="cardCool-container">
         <div th:each="card : ${cards}" class="cardCool">
+            <div th:text="${card.number}"></div>
             <img th:src="@{'/image/' + ${card.image}}"/>
             <h3 th:text="${card.name}"></h3>
             <p>
@@ -71,21 +114,33 @@
                    class="btn btn-sm">Детали</a>
             </p>
             <p>
-                <a th:href="@{/user-cards/add/{id}(id=${card.id})}"
+                <a th:href="@{/user-cards/add/{id}(id=${card.id},
+                       page=${currentPage}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}"
                    class="btn btn-sm btn-primary"
                    onclick="return confirm('Вы уверены?')"
                    sec:authorize="hasAuthority('USER')">Добавить на аккаунт</a>
 
-                <a th:href="@{/image/upload/{cardId}(cardId=${card.id})}"
-                   class="btn btn-sm" +
+                <a th:href="@{/image/upload/{cardId}(cardId=${card.id},
+                       page=${currentPage}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}"
+                   class="btn btn-sm"
                    sec:authorize="hasAuthority('ADMIN')">Добавить изображение</a>
             </p>
             <p>
-                <a th:href="@{/cards/update/{id}(id=${card.id})}"
+                <a th:href="@{/cards/update/{id}(id=${card.id},
+                       page=${currentPage}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}"
                    class="btn btn-sm"
                    sec:authorize="hasAuthority('ADMIN')">Редактировать</a>
 
-                <a th:href="@{/cards/delete/{id}(id=${card.id})}"
+                <a th:href="@{/cards/delete/{id}(id=${card.id},
+                       page=${currentPage}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}"
                    class="btn btn-sm btn-danger"
                    onclick="return confirm('Вы уверены?')"
                    sec:authorize="hasAuthority('ADMIN')">Удалить</a>
@@ -98,44 +153,49 @@
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link"
                        th:href="@{/cards(page=1, size=${pageSize},
-                       name=${name}, filter=${filter}, sort=${sort})}">
-                        First
+                       maxNumber=${maxNumber},minNumber=${minNumber},
+                       query=${query}, rank=${rank}, sort=${sort})}">
+                        первая
                     </a>
                 </li>
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link"
                        th:href="@{/cards(page=${currentPage - 1},
-                       size=${pageSize}, name=${name}, filter=${filter}, sort=${sort})}">
-                        Previous
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       size=${pageSize}, query=${query}, rank=${rank}, sort=${sort})}">
+                        Назад
                     </a>
                 </li>
 
                 <li th:each="i : ${#numbers.sequence(1, totalPages)}"
                     class="page-item" th:classappend="${i == currentPage} ? 'active'">
                     <a class="page-link"
-                       th:href="@{/cards(page=${i}, size=${pageSize}, name=${name}, filter=${filter},
-                       sort=${sort})}"
+                       th:href="@{/cards(page=${i}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}"
                        th:text="${i}"></a>
                 </li>
 
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/cards(page=${currentPage + 1}, size=${pageSize}, name=${name},
-                       filter=${filter}, sort=${sort})}">Next</a>
+                       th:href="@{/cards(page=${currentPage + 1}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}">Вперёд</a>
                 </li>
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/cards(page=${totalPages}, size=${pageSize}, name=${name},
-                       filter=${filter}, sort=${sort})}">Last</a>
+                       th:href="@{/cards(page=${totalPages}, size=${pageSize}, query=${query},
+                       maxNumber=${maxNumber}, minNumber=${minNumber},
+                       rank=${rank}, sort=${sort})}">Последняя</a>
                 </li>
             </ul>
         </nav>
 
         <div class="text-center mt-2">
             <small class="text-muted">
-                Showing <span th:text="${(currentPage - 1) * pageSize + 1}"></span> to
-                <span th:text="${currentPage * pageSize > totalItems ? totalItems : currentPage * pageSize}"></span> of
-                <span th:text="${totalItems}"></span> entries
+                Показано c <span th:text="${(currentPage - 1) * pageSize + 1}"></span> по
+                <span th:text="${currentPage * pageSize > totalItems ? totalItems : currentPage * pageSize}"></span> из
+                <span th:text="${totalItems}"></span> карточек
             </small>
         </div>
     </div>

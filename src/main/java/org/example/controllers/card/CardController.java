@@ -15,8 +15,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/cards")
@@ -25,123 +27,184 @@ public class CardController {
     private CardService cardService;
 
     @GetMapping
-    public String showCards(Model model, @ModelAttribute CardFilter filter,
-                            @RequestParam(required = false) String name,
+    public String showCards(Model model,
+                            @RequestParam(required = false) String query,
                             @RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "3") int size,
-                            @RequestParam(defaultValue = "id,asc") String[] sort) throws CardNotFoundException {
+                            @RequestParam(defaultValue = "12") int size,
+                            @RequestParam(defaultValue = "") String sort,
+                            @RequestParam(defaultValue = "") String rank,
+                            @RequestParam(defaultValue = "0") Integer minNumber,
+                            @RequestParam(defaultValue = "10000") Integer maxNumber) {
 
-        // Преобразуем параметр сортировки в Sort объект
+        CardFilter filter = new CardFilter(rank, minNumber, maxNumber);
         Sort sorting = parseSortParameter(sort);
         Pageable pageable = PageRequest.of(page - 1, size, sorting);
 
-        Page<Card> cardPage;
+        Page<Card> cardPage = cardService.findByFilterAndSearch(filter, query, pageable);
 
-        if (name != null && !name.isEmpty()) {
-            cardPage = cardService.findByNameContaining(name, pageable);
-        } else if (filter != null && !filter.isEmpty()) {
-            cardPage = cardService.findByFilter(filter, pageable);
-        } else {
-            cardPage = cardService.getAllCards(pageable);
-        }
-        model.addAttribute("cards", cardPage.getContent());
-        model.addAttribute("filter", filter);
-        model.addAttribute("pageInfo", cardPage); // можно передать весь page объект
+        UserCardController.setModelAtribute(model, query, page, size, sort, rank, minNumber, maxNumber, cardPage);
 
         return "cards/index";
     }
 
-    private Sort parseSortParameter(String[] sort) {
-        if (sort[1].contains(",")) {
-            String[] sortParams = sort[1].split(",");
+    private Sort parseSortParameter(String sort) {
+        if (sort.contains(",")) {
+            String[] sortParams = sort.split(",");
             return Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]);
         } else {
-            // Сортировка по умолчанию
             return Sort.by(Sort.Direction.ASC, "id");
         }
     }
 
-    @GetMapping("/search")
-    public String searchCards(@ModelAttribute CardFilter filter,
-                              @RequestParam String query,
-                              @RequestParam(defaultValue = "1") int page,
-                              @RequestParam(defaultValue = "10") int size,
-                              Model model) {
-
-        Page<Card> cardPage = cardService.search(query, PageRequest.of(page - 1, size));
-
-        model.addAttribute("cards", cardPage.getContent());
-        model.addAttribute("query", query);
-        model.addAttribute("cards", cardPage.getContent());
-        model.addAttribute("filter", filter);
-        model.addAttribute("pageInfo", cardPage); // можно передать весь page объект
-
-        return "cards/index";
-    }
-
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/add")
-    public String formAddCard(Model model) {
+    public String formAddCard(Model model,
+                              @RequestParam(required = false) String query,
+                              @RequestParam(defaultValue = "1") int page,
+                              @RequestParam(defaultValue = "12") int size,
+                              @RequestParam(defaultValue = "id,asc") String sort,
+                              @RequestParam(required = false) String rank,
+                              @RequestParam(required = false) Integer minNumber,
+                              @RequestParam(required = false) Integer maxNumber) {
+
         model.addAttribute("card", new Card());
+        addPaginationAttributes(model, page, size, sort, query, rank, minNumber, maxNumber);
         return "cards/add-form";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add")
-    public String addCard(@ModelAttribute Card card, Model model) throws DuplicateCardException, InvalidCardException {
-        if (cardService.getCardByNumber(card.getNumber()) != null) {
-            model.addAttribute("error", "карточка с таким номером уже существует");
-            return "cards/add-form";
+    public String addCard(@ModelAttribute Card card,
+                          RedirectAttributes redirectAttributes,
+                          @RequestParam(required = false) String query,
+                          @RequestParam(defaultValue = "1") int page,
+                          @RequestParam(defaultValue = "12") int size,
+                          @RequestParam(defaultValue = "id,asc") String sort,
+                          @RequestParam(required = false) String rank,
+                          @RequestParam(required = false) Integer minNumber,
+                          @RequestParam(required = false) Integer maxNumber)
+            throws DuplicateCardException, InvalidCardException, CardNotFoundException {
+
+        if (!cardService.CardByNumberAndCardRankIsNull(card.getNumber(),card.getCardRank())) {
+            redirectAttributes.addFlashAttribute("error", "карточка с таким номером уже существует");
+            return "redirect:/cards/add?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         }
         cardService.addCard(card);
-        return "redirect:/cards";
+        return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/delete/{id}")
-    public String deleteCard(@PathVariable Long id) {
+    public String deleteCard(@PathVariable Long id,
+                             RedirectAttributes redirectAttributes,
+                             @RequestParam(required = false) String query,
+                             @RequestParam(defaultValue = "1") int page,
+                             @RequestParam(defaultValue = "12") int size,
+                             @RequestParam(defaultValue = "id,asc") String sort,
+                             @RequestParam(required = false) String rank,
+                             @RequestParam(required = false) Integer minNumber,
+                             @RequestParam(required = false) Integer maxNumber) {
+
         try {
             cardService.deleteCard(id);
-            return "redirect:/cards";
+            return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         } catch (CardNotFoundException e) {
-            throw new RuntimeException(e);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         }
-
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/update/{id}")
-    public String updateCardForm(@PathVariable Long id, Model model) {
+    public String updateCardForm(@PathVariable Long id, Model model,
+                                 @RequestParam(required = false) String query,
+                                 @RequestParam(defaultValue = "1") int page,
+                                 @RequestParam(defaultValue = "12") int size,
+                                 @RequestParam(defaultValue = "id,asc") String sort,
+                                 @RequestParam(required = false) String rank,
+                                 @RequestParam(required = false) Integer minNumber,
+                                 @RequestParam(required = false) Integer maxNumber) {
+
         try {
-            model.addAttribute("card", cardService.getCardById(id));
+            model.addAttribute("card", cardService.findCardById(id));
+            addPaginationAttributes(model, page, size, sort, query, rank, minNumber, maxNumber);
+            return "cards/edit-form";
         } catch (CardNotFoundException e) {
-            throw new RuntimeException(e);
+            return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         }
-        return "cards/edit-form";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/update")
-    public String updateCard(@ModelAttribute Card card, Model model) {
+    public String updateCard(@ModelAttribute Card card,
+                             RedirectAttributes redirectAttributes,
+                             @RequestParam(required = false) String query,
+                             @RequestParam(defaultValue = "1") int page,
+                             @RequestParam(defaultValue = "12") int size,
+                             @RequestParam(defaultValue = "id,asc") String sort,
+                             @RequestParam(required = false) String rank,
+                             @RequestParam(required = false) Integer minNumber,
+                             @RequestParam(required = false) Integer maxNumber) {
+
         try {
             cardService.updateCard(card);
-        } catch (CardNotFoundException | InvalidCardException e) {
-            model.addAttribute("error", "ошибка");
-            throw new RuntimeException(e);
+            return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
+        } catch (CardNotFoundException | InvalidCardException | DuplicateCardException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cards/update/" + card.getId() + "?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         }
-
-        return "redirect:/cards";
     }
 
     @GetMapping("/details/{id}")
-    public String showOneCard(@PathVariable Long id, Model model) {
+    public String showOneCard(@PathVariable Long id, Model model,
+                              @RequestParam(required = false) String query,
+                              @RequestParam(defaultValue = "1") int page,
+                              @RequestParam(defaultValue = "12") int size,
+                              @RequestParam(defaultValue = "id,asc") String sort,
+                              @RequestParam(required = false) String rank,
+                              @RequestParam(required = false) Integer minNumber,
+                              @RequestParam(required = false) Integer maxNumber) {
+
         try {
-            model.addAttribute("card", cardService.getCardById(id));
+            model.addAttribute("card", cardService.findCardById(id));
+            addPaginationAttributes(model, page, size, sort, query, rank, minNumber, maxNumber);
+            return "cards/details";
         } catch (CardNotFoundException e) {
-            throw new RuntimeException(e);
+            return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
         }
-        return "cards/details";
+    }
+
+    static void addPaginationAttributes(Model model, int page, int size, String sort,
+                                         String query, String rank, Integer minNumber, Integer maxNumber) {
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("sort", sort);
+        model.addAttribute("query", query);
+        model.addAttribute("rank", rank);
+        model.addAttribute("minNumber", minNumber);
+        model.addAttribute("maxNumber", maxNumber);
+    }
+
+    static String buildQueryParams(int page, int size, String sort,
+                                    String query, String rank, Integer minNumber, Integer maxNumber) {
+        StringBuilder params = new StringBuilder();
+        params.append("page=").append(page)
+                .append("&size=").append(size)
+                .append("&sort=").append(sort);
+
+        if (query != null && !query.isEmpty()) {
+            params.append("&query=").append(URLEncoder.encode(query, StandardCharsets.UTF_8));
+        }
+        if (rank != null && !rank.isEmpty()) {
+            params.append("&rank=").append(rank);
+        }
+        if (minNumber != null) {
+            params.append("&minNumber=").append(minNumber);
+        }
+        if (maxNumber != null) {
+            params.append("&maxNumber=").append(maxNumber);
+        }
+
+        return params.toString();
     }
 }
-
-

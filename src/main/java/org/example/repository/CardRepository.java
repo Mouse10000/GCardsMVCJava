@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.model.Card;
+import org.example.model.dto.CardFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,6 +28,11 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
     @Query("SELECT c FROM Card c WHERE " +
             "LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "CAST(c.number AS string) LIKE CONCAT('%', :query, '%') OR " +
-            "LOWER(c.description) LIKE LOWER(CONCAT('%', :query, '%'))")
+            "LOWER(c.description) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "CAST(c.cardRank AS string) LIKE CONCAT('%', :query, '%')" )
     Page<Card> search(@Param("query") String query, Pageable pageable);
+
+    List<Card> findCardsByNumber(int number);
+
+    Optional<Card> findCardByNumberAndCardRank(int number, String cardRank);
 }

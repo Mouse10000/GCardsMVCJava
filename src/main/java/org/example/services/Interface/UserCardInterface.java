@@ -3,6 +3,8 @@ package org.example.services.Interface;
 import org.example.model.Card;
 import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.User.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,4 +18,6 @@ public interface UserCardInterface {
     List<Card> getAllUserCards(String userName) throws UserNotFoundException;
     List<Card> getCardsOnPage(int page) throws CardNotFoundException;
     Card getCardByNumber(int number);
+
+    //Page<Card> getUserCardsByFilter(String username, String query, String rank, Integer minNumber, Integer maxNumber, Pageable pageable);
 }

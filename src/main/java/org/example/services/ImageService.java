@@ -38,15 +38,15 @@ public class ImageService implements ImageServiceInterface {
         }
 
         String uuidFile = UUID.randomUUID().toString();
-        String resultFilename = image.getOriginalFilename();
-
-        image.transferTo(new File(uploadPath + "/" + resultFilename));
 
         Optional<Card> card = cardRepository.findById(cardId);
         if (card.isEmpty()) {
             return;
         }
         Card cardToAdd = card.get();
+        String resultFilename =  cardToAdd.getNumber() + cardToAdd.getName();
+
+        image.transferTo(new File(uploadPath + "/" + resultFilename));
 
         cardToAdd.setImage(resultFilename);
 

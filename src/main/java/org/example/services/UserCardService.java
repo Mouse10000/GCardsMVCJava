@@ -1,7 +1,6 @@
 package org.example.services;
 
 import org.example.model.Card;
-import org.example.model.Trade;
 import org.example.model.User;
 import org.example.model.UserCard;
 import org.example.repository.CardRepository;
@@ -11,9 +10,12 @@ import org.example.services.Interface.Exception.Card.CardNotFoundException;
 import org.example.services.Interface.Exception.User.UserNotFoundException;
 import org.example.services.Interface.UserCardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -70,8 +72,31 @@ public class UserCardService implements UserCardInterface {
     public List<Card> getAllUserCards(String userName) throws UserNotFoundException {
         Optional<User> userBase = userRepository.findByUsername(userName);
         if (userBase.isEmpty()) throw new UserNotFoundException("User not found");
-        List<Card> cards = userCardRepository.findCardsByUser(userBase.get());
         return userCardRepository.findCardsByUser(userBase.get());
+    }
+
+    public Page<Card> getUserCardsByFilter(String userName, String query, String rank,
+                                           Integer minNumber, Integer maxNumber,
+                                           Pageable pageable) throws UserNotFoundException {
+
+        Optional<User> user = userRepository.findByUsername(userName);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        Boolean q = (query == null ||
+                "КЙЦУ".contains(query)
+                && (rank == null || "R".contains(rank))
+                && (minNumber == null || 45 >= minNumber)
+                && (maxNumber == null || 45 <= maxNumber));
+        if (Objects.equals(rank, "")) rank = null;
+        return userCardRepository.findUserCardsByFilter(
+                user.get(),
+                query,
+                rank,
+                minNumber,
+                maxNumber,
+                pageable
+        );
     }
 
     @Override
