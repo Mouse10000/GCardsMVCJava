@@ -1,0 +1,38 @@
+.cardCool-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Расстояние между карточками */
+}
+
+.cardCool {
+    border: 1px solid #ddd;
+    border-radius: 2%;
+    width: 23%; /* Ширина каждой карточки */
+    padding: 1%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.cardCool img {
+    width: 100%; /* Ширина каждой карточки */
+}
+
+.cardCool:hover {
+    transform: translateY(-5px);
+    background-color: #AAAAAA;
+}
+
+.cardCool h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.cardCool p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.cardCool span {
+    font-weight: bold;
+    color: #333;
+}

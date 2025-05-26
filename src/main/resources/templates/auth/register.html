@@ -1,88 +1,47 @@
-<html th:replace="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html th:replace="~{layout}" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="#{page.register}">Register</title>
-    <style>
-        .error-message { color: red; margin-top: 5px; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Регистрация</title>
 </head>
 <body>
 <section th:fragment="content">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <!-- Сообщение об успехе -->
-                <div th:if="${param.success}" class="alert alert-success">
-                    Registration successful!
-                </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card1 shadow">
+                <div class="card1-body">
+                    <h1 class="card1-title text-center mb-4">Регистрация</h1>
 
-                <!-- Сообщение об ошибке -->
-                <div th:if="${param.error}" class="alert alert-danger">
-                    <strong>Error:</strong> <span th:text="${param.error}"></span>
-                </div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-                <h1 class="mb-4">Register</h1>
-
-                <form th:action="@{/auth/register}" method="post">
-                    <!-- Username -->
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control" name="username"
-                               th:value="${registerForm.username}" required>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email"
-                               th:value="${registerForm.email}" required>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" name="confirmPassword" required>
-                    </div>
-
-                    <!-- Age -->
-                    <div class="mb-3">
-                        <label class="form-label">Age</label>
-                        <input type="number" class="form-control" name="age"
-                               th:value="${registerForm.age}" required>
-                    </div>
-
-                    <!-- Gender -->
-                    <div class="mb-3">
-                        <label class="form-label">Gender</label>
-                        <div class="d-flex gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="male"
-                                       id="male" value="male" th:checked="${registerForm.male == 'male'}">
-                                <label class="form-check-label" for="male">Male</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="male"
-                                       id="female" value="female" th:checked="${registerForm.male == 'female'}">
-                                <label class="form-check-label" for="female">Female</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="male"
-                                       id="other" value="other" th:checked="${registerForm.male == 'other'}">
-                                <label class="form-check-label" for="other">Other</label>
-                            </div>
+                    <form th:action="@{/register}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Имя пользователя:</label>
+                            <input type="text" class="form-control" id="username" th:field="*{user.username}" required>
                         </div>
-                    </div>
 
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail:</label>
+                            <input type="email" class="form-control" id="email" th:field="*{user.email}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль:</label>
+                            <input type="password" class="form-control" id="password" th:field="*{user.password}" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                        </div>
+                    </form>
+
+                    <p class="text-center mt-3">Уже есть аккаунт? <a th:href="@{/login}">Войти</a></p>
+                </div>
             </div>
         </div>
     </div>
+</div>
 </section>
 </body>
 </html>

@@ -1,4 +1,5 @@
-<html th:replace="~{layout}" lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:replace="~{layout}" lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <title th:text="#{page.home}">Home</title>
 </head>
@@ -6,11 +7,11 @@
 <section th:fragment="content">
   <div class="hero-section text-center">
     <div class="container">
-      <h1 class="display-4 fw-bold" th:text="#{home.welcome}">Welcome</h1>
-      <p class="lead" th:text="#{home.description}">Site description...</p>
-      <div class="mt-4">
-        <a th:href="@{/auth/register}" class="btn btn-light btn-lg mx-2">Register account</a>
-        <a th:href="@{/auth/login}" class="btn btn-outline-light btn-lg mx-2">Login</a>
+      <h1 class="display-4 fw-bold"> Welcome </h1>
+      <p class="lead"> Site description... </p>
+      <div class="mt-4" sec:authorize="!hasAuthority('USER')">
+        <a th:href="@{/register}" class="btn btn-light btn-lg mx-2">Register account</a>
+        <a th:href="@{/login}" class="btn btn-lg mx-2">Login</a>
       </div>
     </div>
   </div>

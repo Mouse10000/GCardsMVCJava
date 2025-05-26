@@ -1,10 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Список карточек</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<div class="container mt-4" th:fragment="content">
+    <h3>Название</h3>
+    <p th:text="${card.name}"></p>
+    <h3>Описание</h3>
+    <p th:text="${card.description}"></p>
+    <h3>Ранг</h3>
+    <p th:text="${card.cardRank}"></p>
+    <h3>Номер</h3>
+    <p th:text="${card.number}"></p>
+    <h3>Дата добавления</h3>
+    <p th:text="${#temporals.format(card.dateOfAdd, 'dd.MM.yyyy HH:mm')}"></p>
 
+    <h3>Картинка</h3>
+    <p>
+        <img th:src="@{'/image/' + ${card.image}}"/>
+    </p>
+
+    <div>
+        <a th:href="@{/user-cards/add/{id}(id=${card.id})}"
+           class="btn btn-sm btn-primary"
+           onclick="return confirm('Вы уверены?')"
+           sec:authorize="hasAuthority('USER')">Добавить на аккаунт</a>
+
+        <a th:href="@{/image/upload/{cardId}(cardId=${card.id})}"
+           class="btn btn-sm" +
+           sec:authorize="hasAuthority('ADMIN')">Добавить изображение</a>
+
+        <a th:href="@{/cards/update/{id}(id=${card.id})}"
+           class="btn btn-sm"
+           sec:authorize="hasAuthority('ADMIN')">Редактировать</a>
+
+        <a th:href="@{/cards/delete/{id}(id=${card.id})}"
+           class="btn btn-sm btn-danger"
+           onclick="return confirm('Вы уверены?')"
+           sec:authorize="hasAuthority('ADMIN')">Удалить</a>
+        <br>
+        <a th:href="@{/user-cards}"
+           class="btn btn-sm">Перейти к списку ваших карточек</a>
+        <a th:href="@{/cards}"
+           class="btn btn-sm">Перейти к списку карточек системы</a>
+
+    </div>
+
+</div>
 </body>
 </html>

@@ -1,19 +1,16 @@
 package org.example.controllers;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+/**
+ * Контроллер для главной страницы приложения.
+ * Обрабатывает запросы к корневому URL и отображает домашнюю страницу.
+ */
 @Controller
 public class HomeController {
-
-    @GetMapping("/")
-    public String home(Model model) {
-        model.addAttribute("pageTitle", "Главная");
-        return "/welcome";
+    @GetMapping("/home")
+    public String showHomePage() {
+        return "home";
     }
-    @GetMapping("/about")
-    public String about() {
-        return "pages/about";
-    }
-}
+} 
