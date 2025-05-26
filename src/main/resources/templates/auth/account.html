@@ -19,11 +19,6 @@
                             <p class="mb-2"><strong>Имя пользователя:</strong> <span th:text="${user.username}"></span></p>
                             <p class="mb-0"><strong>Роль:</strong> <span th:text="${user.authorities}"></span></p>
 
-
-                            <div sec:authorize="hasAuthority('ADMIN')" class="mb-3">
-                                <a th:href="@{/admin/users}">Список пользователей</a>
-                            </div>
-
                             <form th:action="@{/logout}" method="post" class="mt-4">
                                 <button type="submit" class="btn btn-primary">Выйти</button>
                             </form>
