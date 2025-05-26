@@ -9,7 +9,7 @@ import java.util.Objects;
  * Определяет, какие роли назначены конкретному пользователю.
  */
 @Entity
-@Table(name = "userrole")
+@Table(name = "userRole")
 //@IdClass(UserRole.UserRoleId.class)
 public class UserRole {
 
@@ -46,25 +46,6 @@ public class UserRole {
         return role;
     }
 
-    /*public void setRole(Role role) {
-        this.role = role;
-        this.roleId = role != null ? role.getId() : null;
-    }*/
-/*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserRole)) return false;
-        UserRole userRole = (UserRole) o;
-        return Objects.equals(userRoleId, userRole.userRoleId) &&
-                Objects.equals(roleId, userRole.roleId);
-    }*/
-/*
-    @Override
-    public int hashCode() {
-        return Objects.hash(userRoleId, roleId);
-    }
-*/
     @Embeddable
     public static class UserRoleId implements Serializable {
         private static final long serialVersionUID = -4135407811430541370L;

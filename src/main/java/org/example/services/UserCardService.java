@@ -132,11 +132,7 @@ public class UserCardService implements UserCardInterface {
         if (user.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }
-        Boolean q = (query == null ||
-                "КЙЦУ".contains(query)
-                && (rank == null || "R".contains(rank))
-                && (minNumber == null || 45 >= minNumber)
-                && (maxNumber == null || 45 <= maxNumber));
+
         if (Objects.equals(rank, "")) rank = null;
         return userCardRepository.findUserCardsByFilter(
                 user.get(),

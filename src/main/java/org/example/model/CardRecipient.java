@@ -7,7 +7,7 @@ import javax.persistence.*;
  * Связывает карту с обменом, в котором она запрашивается.
  */
 @Entity
-@Table(name = "card_recipients")
+@Table(name = "cardRecipient")
 public class CardRecipient {
     /**
      * Уникальный идентификатор записи
@@ -20,14 +20,14 @@ public class CardRecipient {
      * Обмен, в котором запрашивается карта
      */
     @ManyToOne
-    @JoinColumn(name = "trade_id", nullable = false)
+    @JoinColumn(name = "tradeId", nullable = false)
     private Trade trade;
 
     /**
      * Карта, запрашиваемая в обмене
      */
     @ManyToOne
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "cardId", nullable = false)
     private Card card;
 
     public CardRecipient(Trade trade, Card card) {

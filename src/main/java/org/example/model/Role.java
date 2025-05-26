@@ -10,7 +10,7 @@ import java.util.Set;
  * Определяет права доступа и возможности пользователя в системе.
  */
 @Entity
-@Table(name = "roles")
+@Table(name = "role")
 public class Role {
     /**
      * Уникальный идентификатор роли
