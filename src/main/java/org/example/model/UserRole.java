@@ -4,6 +4,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Класс, представляющий связь между пользователем и его ролью.
+ * Определяет, какие роли назначены конкретному пользователю.
+ */
 @Entity
 @Table(name = "userrole")
 //@IdClass(UserRole.UserRoleId.class)

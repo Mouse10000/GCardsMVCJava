@@ -21,6 +21,10 @@ import java.nio.charset.StandardCharsets;
 
 import static org.example.controllers.card.CardController.buildQueryParams;
 
+/**
+ * Контроллер для управления изображениями карт.
+ * Обрабатывает запросы на загрузку, просмотр и удаление изображений.
+ */
 @Controller
 @RequestMapping("/image")
 public class ImageController {
@@ -83,4 +87,5 @@ public class ImageController {
     static void setModelAttribute(Model model, @ModelAttribute String rank, @ModelAttribute Integer minNumber, @ModelAttribute Integer maxNumber, @RequestParam(required = false) String query, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "12") int size, @RequestParam(defaultValue = "id,asc") String sort) {
         CardController.addPaginationAttributes(model, page, size, sort, query, rank, minNumber, maxNumber);
     }
+
 }

@@ -5,14 +5,24 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Модель роли пользователя в системе.
+ * Определяет права доступа и возможности пользователя в системе.
+ */
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Role {
+    /**
+     * Уникальный идентификатор роли
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    /**
+     * Название роли (например, ROLE_USER, ROLE_ADMIN)
+     */
+    @Column(unique = true, nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,13 +63,11 @@ public class Role {
         this.userRoles = userRole1s;
     }
 
-    public Set<User> getUsers() {
-        Set<User> users = new HashSet<>();
-        for (UserRole userRole : userRoles) {
-            users.add(userRole.getUser());
-        }
-        return users;
-    }
+    /**
+     * Пользователи, имеющие данную роль
+     */
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users = new HashSet<>();
 
     public void addUser(User user) {
         UserRole userRole = new UserRole(user, this);

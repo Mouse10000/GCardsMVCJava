@@ -22,6 +22,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Контроллер для управления картами пользователей.
+ * Обрабатывает запросы на просмотр, добавление и удаление карт в коллекции пользователя.
+ */
 @Controller
 @RequestMapping("/user-cards")
 @PreAuthorize("hasAuthority('USER')")
@@ -33,6 +37,19 @@ public class UserCardController {
     @Autowired
     private CardService cardService;
 
+    /**
+     * Отображает список карт пользователя
+     * @param model модель для передачи данных в представление
+     * @param user текущий пользователь
+     * @param query поисковый запрос
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @param sort параметры сортировки
+     * @param rank ранг карты
+     * @param minNumber минимальный номер карты
+     * @param maxNumber максимальный номер карты
+     * @return имя представления для страницы со списком карт пользователя
+     */
     @GetMapping
     public String showUserCards(Model model,
                                 @AuthenticationPrincipal User user,
@@ -80,6 +97,20 @@ public class UserCardController {
         model.addAttribute("maxNumber", maxNumber);
     }
 
+    /**
+     * Отображает форму добавления карты в коллекцию пользователя
+     * @param id идентификатор карты
+     * @param user текущий пользователь
+     * @param redirectAttributes атрибуты для перенаправления
+     * @param query поисковый запрос
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @param sort параметры сортировки
+     * @param rank ранг карты
+     * @param minNumber минимальный номер карты
+     * @param maxNumber максимальный номер карты
+     * @return перенаправление на список карт пользователя
+     */
     @GetMapping("/add/{id}")
     public String addUserCard(@PathVariable Long id,
                               @AuthenticationPrincipal User user,
@@ -102,6 +133,20 @@ public class UserCardController {
         return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
     }
 
+    /**
+     * Удаляет карту из коллекции пользователя
+     * @param id идентификатор карты
+     * @param user текущий пользователь
+     * @param redirectAttributes атрибуты для перенаправления
+     * @param query поисковый запрос
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @param sort параметры сортировки
+     * @param rank ранг карты
+     * @param minNumber минимальный номер карты
+     * @param maxNumber максимальный номер карты
+     * @return перенаправление на список карт пользователя
+     */
     @GetMapping("/delete/{id}")
     public String deleteCard(@PathVariable Long id,
                              @AuthenticationPrincipal User user,

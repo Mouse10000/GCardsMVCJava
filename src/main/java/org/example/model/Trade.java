@@ -4,27 +4,49 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Модель обмена картами между пользователями.
+ * Представляет информацию об обмене, включая отправителя, получателя и обмениваемые карты.
+ */
 @Entity(name = "trade")
 @Table(name = "trade")
 public class Trade {
+    /**
+     * Уникальный идентификатор обмена
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Пользователь, инициировавший обмен
+     */
     @ManyToOne
     @JoinColumn(name = "UserSender", nullable = false)
     private User userSender;
 
-    @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CardSender> cardSenders = new HashSet<>();
-
+    /**
+     * Пользователь, получающий карты в обмене
+     */
     @ManyToOne
     @JoinColumn(name = "UserRecipient", nullable = false)
     private User userRecipient;
 
+    /**
+     * Карты, предлагаемые для обмена отправителем
+     */
+    @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CardSender> cardSenders = new HashSet<>();
+
+    /**
+     * Карты, запрашиваемые получателем в обмене
+     */
     @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CardRecipient> cardRecipients = new HashSet<>();
 
+    /**
+     * Статус обмена (например, ожидает подтверждения, завершен, отменен)
+     */
     @Column(nullable = false)
     private String state;
 

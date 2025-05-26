@@ -19,6 +19,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервис для управления карточками в системе.
+ * Предоставляет методы для добавления, обновления, удаления и поиска карточек.
+ */
 @Service
 public class CardService implements CardServiceInterface {
     @Autowired
@@ -28,16 +32,32 @@ public class CardService implements CardServiceInterface {
     @Autowired
     private UserCardRepository userCardRepository;
 
-    //@Override
+    /**
+     * Получает все карточки с пагинацией
+     * @param pageable параметры пагинации
+     * @return страница с карточками
+     */
     public Page<Card> getAllCards(Pageable pageable) {
         return cardRepository.findAll(pageable);
     }
 
-    //@Override
+    /**
+     * Ищет карточки по имени с учетом регистра
+     * @param name имя для поиска
+     * @param pageable параметры пагинации
+     * @return страница с найденными карточками
+     */
     public Page<Card> findByNameContaining(String name, Pageable pageable) {
         return cardRepository.findByNameContainingIgnoreCase(name, pageable);
     }
 
+    /**
+     * Ищет карточки по фильтру и поисковому запросу
+     * @param filter фильтр для поиска
+     * @param query поисковый запрос
+     * @param pageable параметры пагинации
+     * @return страница с отфильтрованными карточками
+     */
     public Page<Card> findByFilterAndSearch(CardFilter filter, String query, Pageable pageable) {
         Specification<Card> spec = Specification.where(null);
 
@@ -75,31 +95,12 @@ public class CardService implements CardServiceInterface {
         return cardRepository.findAll(spec, pageable);
     }
 
-    //@Override
-    /*public Page<Card> findByFilter(CardFilter filter, Pageable pageable) {
-        Specification<Card> spec = Specification.where(null);
-
-        if (filter.getRank() != null && !filter.getRank().isEmpty()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("cardRank")), filter.getRank()));
-        }
-
-        if (filter.getMinNumber() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.greaterThanOrEqualTo(root.get("number"), filter.getMinNumber()));
-        }
-
-        if (filter.getMaxNumber() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.lessThanOrEqualTo(root.get("number"), filter.getMaxNumber()));
-        }
-
-        return cardRepository.findAll(spec, pageable);
-    }
-    public Page<Card> search(String query, Pageable pageable) {
-        return cardRepository.search(query, pageable);
-    }*/
-
+    /**
+     * Добавляет новую карточку в систему
+     * @param card карточка для добавления
+     * @throws DuplicateCardException если карточка уже существует
+     * @throws InvalidCardException если данные карточки некорректны
+     */
     @Override
     public void addCard(Card card) throws DuplicateCardException, InvalidCardException {
 
@@ -108,23 +109,48 @@ public class CardService implements CardServiceInterface {
         cardRepository.save(card);
     }
 
+    /**
+     * Проверяет существование карточки по номеру и рангу
+     * @param number номер карточки
+     * @param cardRank ранг карточки
+     * @return true если карточка не существует
+     */
     @Override
     public Boolean CardByNumberAndCardRankIsNull(int number, String cardRank) {
         Optional<Card> card = cardRepository.findCardByNumberAndCardRank(number,cardRank);
         return card.isEmpty();
     }
 
+    /**
+     * Находит карточку по ID
+     * @param cardId ID карточки
+     * @return найденная карточка
+     * @throws CardNotFoundException если карточка не найдена
+     */
     public Card findCardById(long cardId) throws CardNotFoundException {
         Optional<Card> card = cardRepository.findById(cardId);
         if (card.isEmpty()) throw new CardNotFoundException("Card not found");
         return card.get();
     }
 
+    /**
+     * Получает список карточек по имени
+     * @param name имя карточки
+     * @return список найденных карточек
+     * @throws CardNotFoundException если карточки не найдены
+     */
     @Override
     public List<Card> getCardsByName(String name) throws CardNotFoundException {
         return cardRepository.findAllByName(name);
     }
 
+    /**
+     * Обновляет информацию о карточке
+     * @param card обновленная карточка
+     * @throws CardNotFoundException если карточка не найдена
+     * @throws InvalidCardException если данные карточки некорректны
+     * @throws DuplicateCardException если обновление создаст дубликат
+     */
     @Override
     public void updateCard(Card card) throws CardNotFoundException, InvalidCardException, DuplicateCardException {
         Optional<Card> cardBase = cardRepository.findById(card.getId());
@@ -138,6 +164,11 @@ public class CardService implements CardServiceInterface {
 
     }
 
+    /**
+     * Удаляет карточку по ID
+     * @param cardId ID карточки
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void deleteCard(long cardId) throws CardNotFoundException {
         Optional<Card> card = cardRepository.findById(cardId);
@@ -145,11 +176,21 @@ public class CardService implements CardServiceInterface {
         cardRepository.deleteById(cardId);
     }
 
+    /**
+     * Получает список всех карточек
+     * @return список всех карточек
+     */
     @Override
     public List<Card> getAllCards() {
         return cardRepository.findAll();
     }
 
+    /**
+     * Получает карточки для определенной страницы
+     * @param page номер страницы
+     * @return список карточек на странице
+     * @throws CardNotFoundException если карточки не найдены
+     */
     @Override
     public List<Card> getCardsOnPage(int page) throws CardNotFoundException {
         Pageable firstPageWithTenElements = PageRequest.of(page - 1, 10);

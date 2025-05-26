@@ -20,12 +20,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Контроллер для управления картами.
+ * Обрабатывает запросы на создание, просмотр, редактирование и удаление карт.
+ */
 @Controller
 @RequestMapping("/cards")
 public class CardController {
     @Autowired
     private CardService cardService;
 
+    /**
+     * Отображает список всех карт
+     * @param model модель для передачи данных в представление
+     * @return имя представления для страницы со списком карт
+     */
     @GetMapping
     public String showCards(Model model,
                             @RequestParam(required = false) String query,
@@ -56,6 +65,11 @@ public class CardController {
         }
     }
 
+    /**
+     * Отображает форму создания новой карты
+     * @param model модель для передачи данных в представление
+     * @return имя представления для формы создания карты
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/add")
     public String formAddCard(Model model,
@@ -72,6 +86,11 @@ public class CardController {
         return "cards/add-form";
     }
 
+    /**
+     * Создает новую карту
+     * @param card данные новой карты
+     * @return перенаправление на список карт
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add")
     public String addCard(@ModelAttribute Card card,
@@ -93,6 +112,11 @@ public class CardController {
         return "redirect:/cards?" + buildQueryParams(page, size, sort, query, rank, minNumber, maxNumber);
     }
 
+    /**
+     * Удаляет карту
+     * @param id идентификатор карты
+     * @return перенаправление на список карт
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/delete/{id}")
     public String deleteCard(@PathVariable Long id,
@@ -114,6 +138,12 @@ public class CardController {
         }
     }
 
+    /**
+     * Отображает форму редактирования карты
+     * @param id идентификатор карты
+     * @param model модель для передачи данных в представление
+     * @return имя представления для формы редактирования карты
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/update/{id}")
     public String updateCardForm(@PathVariable Long id, Model model,
@@ -134,6 +164,11 @@ public class CardController {
         }
     }
 
+    /**
+     * Обновляет информацию о карте
+     * @param card обновленные данные карты
+     * @return перенаправление на детали карты
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/update")
     public String updateCard(@ModelAttribute Card card,
@@ -155,6 +190,12 @@ public class CardController {
         }
     }
 
+    /**
+     * Отображает детальную информацию о карте
+     * @param id идентификатор карты
+     * @param model модель для передачи данных в представление
+     * @return имя представления для страницы с деталями карты
+     */
     @GetMapping("/details/{id}")
     public String showOneCard(@PathVariable Long id, Model model,
                               @RequestParam(required = false) String query,

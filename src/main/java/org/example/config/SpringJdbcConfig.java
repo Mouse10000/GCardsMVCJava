@@ -8,6 +8,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+/**
+ * Конфигурационный класс для настройки JDBC подключения.
+ * Определяет источник данных и шаблон для работы с базой данных.
+ */
 @Configuration
 @ComponentScan("org.example")
 public class SpringJdbcConfig {

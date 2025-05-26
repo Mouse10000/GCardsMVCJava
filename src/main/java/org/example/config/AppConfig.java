@@ -31,6 +31,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * Основной класс конфигурации приложения.
+ * Настраивает Spring MVC, JPA репозитории и транзакции.
+ */
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "org.example")

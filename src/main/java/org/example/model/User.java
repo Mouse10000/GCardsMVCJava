@@ -4,24 +4,64 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Модель пользователя системы.
+ * Представляет информацию о пользователе, включая его учетные данные и личную информацию.
+ */
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
+    /**
+     * Уникальный идентификатор пользователя
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    /**
+     * Уникальное имя пользователя для входа в систему
+     */
+    @Column(unique = true, nullable = false)
     private String username;
 
+    /**
+     * Пароль пользователя (хранится в зашифрованном виде)
+     */
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true)
+    /**
+     * Электронная почта пользователя
+     */
+    @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> userRoles = new HashSet<>();
+    /**
+     * Имя пользователя
+     */
+    private String firstName;
+
+    /**
+     * Фамилия пользователя
+     */
+    private String lastName;
+
+    /**
+     * Роли пользователя в системе
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    /**
+     * Карты в коллекции пользователя
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserCard> userCards = new HashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -45,29 +85,20 @@ public class User {
         this.email = email;
     }
 
-    public Set<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(Set<UserRole> userRole1s) {
-        this.userRoles = userRoles;
-    }
-
     public Set<Role> getRoles() {
-        Set<Role> roles = new HashSet<>();
-        for (UserRole userRole : userRoles) {
-            roles.add(userRole.getRole());
-        }
         return roles;
     }
 
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
     public void addRole(Role role) {
-        UserRole userRole = new UserRole(this, role);
-        userRoles.add(userRole);
+        roles.add(role);
     }
 
     public void removeRole(Role role) {
-        userRoles.removeIf(userRole -> userRole.getRole().equals(role));
+        roles.remove(role);
     }
 
     public void assignRole(Role role) {
@@ -83,11 +114,11 @@ public class User {
     }
 
     public boolean hasRole(Role role) {
-        return getRoles().contains(role);
+        return roles.contains(role);
     }
 
     public boolean hasRole(String roleName) {
-        return getRoles().stream()
+        return roles.stream()
                 .anyMatch(role -> role.getName().equals(roleName));
     }
 }

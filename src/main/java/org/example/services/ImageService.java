@@ -17,6 +17,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис для управления изображениями карточек.
+ * Предоставляет методы для сохранения, загрузки и обработки изображений.
+ */
 @Service
 public class ImageService implements ImageServiceInterface {
 
@@ -26,6 +30,13 @@ public class ImageService implements ImageServiceInterface {
     @Autowired
     private CardRepository cardRepository;
 
+    /**
+     * Сохраняет изображение карточки
+     * @param file файл изображения
+     * @param cardId ID карточки
+     * @return путь к сохраненному изображению
+     * @throws IOException если произошла ошибка при сохранении файла
+     */
     @Override
     public void addImageToCard(Long cardId, MultipartFile image) throws IOException {
         if (!(image != null && !Objects.requireNonNull(image.getOriginalFilename()).isEmpty())) {
@@ -53,7 +64,12 @@ public class ImageService implements ImageServiceInterface {
         cardRepository.save(cardToAdd);
     }
 
-
+    /**
+     * Загружает изображение карточки
+     * @param cardId ID карточки
+     * @return файл изображения
+     * @throws IOException если произошла ошибка при загрузке файла
+     */
     @Override
     public Resource getImageOfCard(Long cardId) {
 

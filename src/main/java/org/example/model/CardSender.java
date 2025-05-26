@@ -2,19 +2,32 @@ package org.example.model;
 
 import javax.persistence.*;
 
+/**
+ * Модель карты, предлагаемой для обмена отправителем.
+ * Связывает карту с обменом, в котором она предлагается.
+ */
 @Entity
-@Table(name = "CardSender")
+@Table(name = "card_senders")
 public class CardSender {
+    /**
+     * Уникальный идентификатор записи
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Обмен, в котором предлагается карта
+     */
     @ManyToOne
-    @JoinColumn(name = "TradeId", nullable = false)
+    @JoinColumn(name = "trade_id", nullable = false)
     private Trade trade;
 
+    /**
+     * Карта, предлагаемая для обмена
+     */
     @ManyToOne
-    @JoinColumn(name = "CardId", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
 

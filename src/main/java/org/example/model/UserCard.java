@@ -2,23 +2,47 @@ package org.example.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Модель связи между пользователем и картой.
+ * Представляет информацию о картах в коллекции пользователя.
+ */
 @Entity
-@Table(name = "userCard")
+@Table(name = "user_cards")
 //@IdClass(UserRole.UserRoleId.class)
 public class UserCard {
 
     @EmbeddedId
     private UserCardId userCardId;
 
+    /**
+     * Уникальный идентификатор записи
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Пользователь, владеющий картой
+     */
     @ManyToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Карта в коллекции пользователя
+     */
     @ManyToOne
-    @JoinColumn(name = "cardId", insertable = false, updatable = false)
+    @JoinColumn(name = "card_id", nullable = false)
     private Card card;
+
+    /**
+     * Дата добавления карты в коллекцию
+     */
+    @Column(nullable = false)
+    private LocalDateTime dateAdded;
 
     private int CountDuplicate;
     public UserCard() {

@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Контроллер для управления обменом картами между пользователями.
+ * Обрабатывает запросы на создание, просмотр и управление обменами.
+ */
 @Controller
 @RequestMapping("/trades")
 @PreAuthorize("hasAuthority('USER')")
@@ -32,6 +36,11 @@ public class TradeController {
     @Autowired
     private UserCardService userCardService;
 
+    /**
+     * Отображает список всех обменов
+     * @param model модель для передачи данных в представление
+     * @return имя представления для страницы со списком обменов
+     */
     @GetMapping
     public String showTrades(Model model,
                              @AuthenticationPrincipal User user) throws CardNotFoundException {
@@ -53,6 +62,11 @@ public class TradeController {
         return "trades/list";
     }
 
+    /**
+     * Отображает форму создания нового обмена
+     * @param model модель для передачи данных в представление
+     * @return имя представления для формы создания обмена
+     */
     @GetMapping("/init")
     public String initTradeForm(Model model,
                                 @AuthenticationPrincipal User user) {
@@ -67,6 +81,11 @@ public class TradeController {
         return "trades/choose-user";
     }
 
+    /**
+     * Создает новый обмен
+     * @param trade данные нового обмена
+     * @return перенаправление на список обменов
+     */
     @PostMapping("/init")
     public String initTrade(@ModelAttribute Trade trade,
                             @AuthenticationPrincipal User user) {
@@ -153,6 +172,12 @@ public class TradeController {
         return "redirect:/trades/form-recipient-cards/" + tradeId;
     }
 
+    /**
+     * Отображает детальную информацию об обмене
+     * @param id идентификатор обмена
+     * @param model модель для передачи данных в представление
+     * @return имя представления для страницы с деталями обмена
+     */
     @GetMapping("/details/{id}")
     public String editTrade(Model model, @PathVariable Long id,
                             @AuthenticationPrincipal User user) {
@@ -237,6 +262,5 @@ public class TradeController {
         }
         return "redirect:/trades";
     }
-
 
 }

@@ -6,24 +6,50 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Модель карты в системе.
+ * Представляет информацию о карте, включая её характеристики и изображение.
+ */
 @Entity(name = "Card")
 @Table(name = "card")
 public class Card {
+    /**
+     * Уникальный идентификатор карты
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /**
+     * Название карты
+     */
     @Column(nullable = false, name = "name")
     private String name;
+
     @Column(nullable = true)
     private LocalDateTime dateOfAdd  = LocalDateTime.now();
+
+    /**
+     * Ранг карты (например, обычная, редкая, эпическая)
+     */
     @Column(nullable = false)
     private String cardRank;
 
+    /**
+     * Уникальный номер карты
+     */
     @Column(nullable = false, name = "number")
     private int number;
 
+    /**
+     * Описание карты
+     */
     @Column(nullable = true)
     private String description;
+
+    /**
+     * Путь к изображению карты
+     */
     @Column(nullable = true)
     private String image;
 

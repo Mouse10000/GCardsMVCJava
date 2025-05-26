@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Сервис для управления обменом карточками между пользователями.
+ * Предоставляет методы для создания, подтверждения и отмены обменов.
+ */
 @Service
 public class TradeService implements TradeServiceInterface {
     @Autowired
@@ -31,6 +35,15 @@ public class TradeService implements TradeServiceInterface {
     @Autowired
     private CardRecipientRepository cardRecipientRepository;
 
+    /**
+     * Инициализирует новый обмен между пользователями
+     * @param userSenderName имя отправителя
+     * @param userRecipientName имя получателя
+     * @return ID созданного обмена
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     * @throws TradeException если произошла ошибка при создании обмена
+     */
     @Override
     public Long initTrade(String userSenderName, String userRecipientName) throws UserNotFoundException, CardNotFoundException, TradeException {
         Optional<User> userSender = userRepository.findByUsername(userSenderName);
@@ -44,6 +57,14 @@ public class TradeService implements TradeServiceInterface {
         return trades.get(trades.size() - 1).getId();
     }
 
+    /**
+     * Добавляет карточку отправителя в обмен
+     * @param tradeId ID обмена
+     * @param cardId ID карточки
+     * @throws TradeNotFoundException если обмен не найден
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void setSenderCard(Long tradeId, Long cardId) throws TradeNotFoundException, UserNotFoundException, CardNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -65,6 +86,14 @@ public class TradeService implements TradeServiceInterface {
         }
     }
 
+    /**
+     * Удаляет карточку отправителя из обмена
+     * @param tradeId ID обмена
+     * @param cardId ID карточки
+     * @throws TradeNotFoundException если обмен не найден
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void deleteSenderCard(Long tradeId, Long cardId) throws TradeNotFoundException, UserNotFoundException, CardNotFoundException {
         Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
@@ -87,6 +116,12 @@ public class TradeService implements TradeServiceInterface {
         }
     }
 
+    /**
+     * Получает список карточек отправителя в обмене
+     * @param tradeId ID обмена
+     * @return список карточек
+     * @throws TradeNotFoundException если обмен не найден
+     */
     @Override
     public List<Card> getSenderCards(Long tradeId) throws TradeNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -95,6 +130,14 @@ public class TradeService implements TradeServiceInterface {
         return cardSenderRepository.getCardSenderByTrade(trade.get());
     }
 
+    /**
+     * Добавляет карточку получателя в обмен
+     * @param tradeId ID обмена
+     * @param cardId ID карточки
+     * @throws TradeNotFoundException если обмен не найден
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void setRecipientCard(Long tradeId, Long cardId) throws TradeNotFoundException, UserNotFoundException, CardNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -155,6 +198,13 @@ public class TradeService implements TradeServiceInterface {
         return cardRecipientRepository.findUserCardsNotInTrade(userRecipient, trade.get());
     }
 
+    /**
+     * Подтверждает обмен карточками
+     * @param tradeId ID обмена
+     * @throws TradeException если произошла ошибка при обмене
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void createTrade(Long tradeId) throws TradeException, CardNotFoundException, UserNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -162,6 +212,13 @@ public class TradeService implements TradeServiceInterface {
         updateTradeState(tradeId, "post");
     }
 
+    /**
+     * Подтверждает обмен карточками
+     * @param tradeId ID обмена
+     * @throws TradeException если произошла ошибка при обмене
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void submitTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -180,6 +237,13 @@ public class TradeService implements TradeServiceInterface {
         updateTradeState(tradeId, "completedSuccess");
     }
 
+    /**
+     * Отменяет обмен карточками
+     * @param tradeId ID обмена
+     * @throws TradeException если произошла ошибка при отмене
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws CardNotFoundException если карточка не найдена
+     */
     @Override
     public void cancelTrade(Long tradeId) throws TradeException, UserNotFoundException, CardNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -193,6 +257,14 @@ public class TradeService implements TradeServiceInterface {
         updateTradeState(tradeId, "completedCancel");
     }
 
+    /**
+     * Обновляет состояние обмена
+     * @param tradeId ID обмена
+     * @param state новое состояние
+     * @throws TradeNotFoundException если обмен не найден
+     * @throws InvalidTradeStateException если состояние некорректно
+     * @throws UserNotFoundException если пользователь не найден
+     */
     @Override
     public void updateTradeState(long tradeId, String state) throws TradeNotFoundException, InvalidTradeStateException, UserNotFoundException {
         Optional<Trade> trade = tradeRepository.findById(tradeId);
@@ -207,6 +279,12 @@ public class TradeService implements TradeServiceInterface {
 
     }
 
+    /**
+     * Получает обмен по ID
+     * @param tradeId ID обмена
+     * @return найденный обмен
+     * @throws TradeNotFoundException если обмен не найден
+     */
     @Override
     public Trade getTradeById(long tradeId) throws TradeNotFoundException {
         Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
@@ -215,6 +293,12 @@ public class TradeService implements TradeServiceInterface {
         return tradeBase.get();
     }
 
+    /**
+     * Проверяет, опубликован ли обмен
+     * @param tradeId ID обмена
+     * @return true если обмен опубликован
+     * @throws TradeNotFoundException если обмен не найден
+     */
     @Override
     public Boolean tradePosted(long tradeId) throws TradeNotFoundException {
         Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
@@ -223,6 +307,12 @@ public class TradeService implements TradeServiceInterface {
         return tradeBase.get().getState().equals("post");
     }
 
+    /**
+     * Проверяет, завершен ли обмен
+     * @param tradeId ID обмена
+     * @return true если обмен завершен
+     * @throws TradeNotFoundException если обмен не найден
+     */
     @Override
     public Boolean tradeCompleted(long tradeId) throws TradeNotFoundException {
         Optional<Trade> tradeBase = tradeRepository.findById(tradeId);
